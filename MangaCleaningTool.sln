@@ -1,0 +1,53 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30002.166
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MangaCleanerSuzuki", "MangaCleaningTool\MangaCleaningTool.vcxproj", "{3B5061A7-EDEB-4D5C-9E03-2AA26B546244}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommonFiles", "CommonFiles\CommonFiles.vcxitems", "{00A8D8D0-1C8D-4C3C-8EC2-86E79823A8F7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TrainingDataExtractor", "TrainingDataExtractor\TrainingDataExtractor.vcxproj", "{64C27BBD-50BD-430A-9C87-42D18910FF77}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Trainer", "Trainer\Trainer.vcxproj", "{3F864D06-34F7-4D56-B0E2-DADED46CFABB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3B5061A7-EDEB-4D5C-9E03-2AA26B546244}.Debug|x64.ActiveCfg = Debug|x64
+		{3B5061A7-EDEB-4D5C-9E03-2AA26B546244}.Debug|x64.Build.0 = Debug|x64
+		{3B5061A7-EDEB-4D5C-9E03-2AA26B546244}.Debug|x86.ActiveCfg = Debug|Win32
+		{3B5061A7-EDEB-4D5C-9E03-2AA26B546244}.Debug|x86.Build.0 = Debug|Win32
+		{3B5061A7-EDEB-4D5C-9E03-2AA26B546244}.Release|x64.ActiveCfg = Release|x64
+		{3B5061A7-EDEB-4D5C-9E03-2AA26B546244}.Release|x64.Build.0 = Release|x64
+		{3B5061A7-EDEB-4D5C-9E03-2AA26B546244}.Release|x86.ActiveCfg = Release|Win32
+		{3B5061A7-EDEB-4D5C-9E03-2AA26B546244}.Release|x86.Build.0 = Release|Win32
+		{64C27BBD-50BD-430A-9C87-42D18910FF77}.Debug|x64.ActiveCfg = Debug|x64
+		{64C27BBD-50BD-430A-9C87-42D18910FF77}.Debug|x64.Build.0 = Debug|x64
+		{64C27BBD-50BD-430A-9C87-42D18910FF77}.Debug|x86.ActiveCfg = Debug|Win32
+		{64C27BBD-50BD-430A-9C87-42D18910FF77}.Debug|x86.Build.0 = Debug|Win32
+		{64C27BBD-50BD-430A-9C87-42D18910FF77}.Release|x64.ActiveCfg = Release|x64
+		{64C27BBD-50BD-430A-9C87-42D18910FF77}.Release|x64.Build.0 = Release|x64
+		{64C27BBD-50BD-430A-9C87-42D18910FF77}.Release|x86.ActiveCfg = Release|Win32
+		{64C27BBD-50BD-430A-9C87-42D18910FF77}.Release|x86.Build.0 = Release|Win32
+		{3F864D06-34F7-4D56-B0E2-DADED46CFABB}.Debug|x64.ActiveCfg = Debug|x64
+		{3F864D06-34F7-4D56-B0E2-DADED46CFABB}.Debug|x64.Build.0 = Debug|x64
+		{3F864D06-34F7-4D56-B0E2-DADED46CFABB}.Debug|x86.ActiveCfg = Debug|Win32
+		{3F864D06-34F7-4D56-B0E2-DADED46CFABB}.Debug|x86.Build.0 = Debug|Win32
+		{3F864D06-34F7-4D56-B0E2-DADED46CFABB}.Release|x64.ActiveCfg = Release|x64
+		{3F864D06-34F7-4D56-B0E2-DADED46CFABB}.Release|x64.Build.0 = Release|x64
+		{3F864D06-34F7-4D56-B0E2-DADED46CFABB}.Release|x86.ActiveCfg = Release|Win32
+		{3F864D06-34F7-4D56-B0E2-DADED46CFABB}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {08DA0380-E69D-4479-ADBD-D8CFE323ED34}
+	EndGlobalSection
+EndGlobal
