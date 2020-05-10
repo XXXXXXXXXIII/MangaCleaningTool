@@ -12,6 +12,12 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Trainer", "Trainer\Trainer.vcxproj", "{3F864D06-34F7-4D56-B0E2-DADED46CFABB}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		CommonFiles\CommonFiles.vcxitems*{00a8d8d0-1c8d-4c3c-8ec2-86e79823a8f7}*SharedItemsImports = 9
+		CommonFiles\CommonFiles.vcxitems*{3b5061a7-edeb-4d5c-9e03-2aa26b546244}*SharedItemsImports = 4
+		CommonFiles\CommonFiles.vcxitems*{3f864d06-34f7-4d56-b0e2-daded46cfabb}*SharedItemsImports = 4
+		CommonFiles\CommonFiles.vcxitems*{64c27bbd-50bd-430a-9c87-42d18910ff77}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
