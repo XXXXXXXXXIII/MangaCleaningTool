@@ -1,5 +1,7 @@
 #pragma once
 
+#include <frame_boost_yaml.h>
+
 #include <opencv2/core.hpp>
 #include <opencv2/ml.hpp>
 
@@ -21,7 +23,11 @@ namespace mct
 				+ std::to_string((float)box.br().y / page.height) + ", "
 				+ std::to_string((float)box.width / page.width) + ", "
 				+ std::to_string((float)box.height / page.height) + ", "
-				+ std::to_string((float)box.area() / page.area());
+				+ std::to_string((float)box.area() / page.area()) + ", "
+				+ std::to_string((float)box.tl().x / page.width > 0.8 
+					|| (float)box.tl().y / page.height > 0.8
+					|| (float)box.br().x / page.width < 0.2
+					|| (float)box.br().y / page.height < 0.2);
 		}
 
 		std::vector<float> toInputData()
@@ -33,7 +39,11 @@ namespace mct
 				(float)box.br().y / page.height,
 				(float)box.width / page.width,
 				(float)box.height / page.height,
-				(float)box.area() / page.area()};
+				(float)box.area() / page.area(),
+				(float)((float)box.tl().x / page.width > 0.8
+					|| (float)box.tl().y / page.height > 0.8
+					|| (float)box.br().x / page.width < 0.2
+					|| (float)box.br().y / page.height < 0.2)};
 		}
 	};
 
@@ -47,8 +57,8 @@ namespace mct
 		cv::Ptr<cv::ml::Boost> frameClassifier;
 
 	public:
-		BoostFrameClassifier(std::string file = "frame_boost.yaml");
-		void classifyFrame(Frame& f);
-		void classifyFrame(std::vector<Frame>& f);
+		BoostFrameClassifier(std::string str_model = frame_boost_model);
+		void classifyFrame(Frame& frame);
+		void classifyFrame(std::vector<Frame>& frames);
 	};
 };

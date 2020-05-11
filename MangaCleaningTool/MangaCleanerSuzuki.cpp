@@ -19,20 +19,14 @@ using namespace mct;
 int main()
 {
     map<string, Mat> images = loadImages(selectImageFromDialog());
-    Ptr<Boost> frame_boost = Boost::load("frame_boost.yaml");
+    Ptr<BoostFrameClassifier> frame_boost = new BoostFrameClassifier();
 
     for (auto img : images)
     {
         Mat img_gray = toGrayScale(img.second);
         vector<Frame> frames = extractFrame(img_gray);
 
-        for (int i = 0; i < frames.size(); i++)
-        {
-            Mat result;
-            frame_boost->predict(frames[i].toInputData(), result);
-            frames[i].is_frame = result.at<float>(0, 0) > 0;
-        }
-
+        frame_boost->classifyFrame(frames);
         cleanFrame(img_gray, frames);
         showImage(img_gray);
     }

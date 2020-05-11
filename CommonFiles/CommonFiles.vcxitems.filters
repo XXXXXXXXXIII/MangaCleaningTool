@@ -7,6 +7,9 @@
     <Filter Include="Source Files">
       <UniqueIdentifier>{58c029ad-9c87-486d-9a08-191b5513edf9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{022e0d74-6c15-4bc8-8a7e-b6c6f558ce3b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)bubble.h">
@@ -20,6 +23,9 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)mct.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)frame_boost_yaml.h">
+      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

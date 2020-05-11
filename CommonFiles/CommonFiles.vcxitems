@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)bubble.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)frame.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)frame_boost_yaml.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)io.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)mct.h" />
   </ItemGroup>

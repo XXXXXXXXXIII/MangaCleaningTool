@@ -4,10 +4,12 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/photo.hpp>
+#include <opencv2/ml.hpp>
 #include <iostream>
 
 using namespace std;
 using namespace cv;
+using namespace cv::ml;
 
 namespace mct
 {
@@ -191,6 +193,27 @@ namespace mct
             drawContours(mask, vector<vector<Point>>{ f.contour }, -1, Scalar(255), FILLED);
         }
         return mask;
+    }
+    BoostFrameClassifier::BoostFrameClassifier(std::string str_model)
+    {
+        this->frameClassifier = Boost::loadFromString<Boost>(cv::String(str_model));
+    }
+
+    void BoostFrameClassifier::classifyFrame(Frame& frame)
+    {
+        Mat result;
+        this->frameClassifier->predict(frame.toInputData(), result);
+        frame.is_frame = result.at<float>(0, 0) > 0;
+    }
+
+    void BoostFrameClassifier::classifyFrame(vector<Frame>& frames)
+    {
+        for (int i = 0; i < frames.size(); i++)
+        {
+            Mat result;
+            this->frameClassifier->predict(frames[i].toInputData(), result);
+            frames[i].is_frame = result.at<float>(0, 0) > 0;
+        }
     }
 };
 
