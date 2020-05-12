@@ -28,8 +28,8 @@ namespace mct
     /*
         Extract frame, returns list of pair of individual frame mask and its rect relative to img
         Derived from: https://ieeexplore.ieee.org/document/5501698
-        @param img_bin: greyscale of the image, CV_8UC1
-        @param frame_mask: returned mask for panels, CV_8UC1
+        @param img: greyscale image, CV_8UC1
+        TODO: Improve frame extraction
     */
     vector<Frame> extractFrame(const Mat& img)
     {
@@ -51,7 +51,7 @@ namespace mct
         findContours(img_bin, ext_contour, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
         drawContours(img_bin, ext_contour, -1, Scalar(CONTOUR_COLOR_L), FILLED, 8);
         vector<pair<Rect, Point>> ext_box, frame_box;
-        for (auto c : ext_contour)
+        for (auto& c : ext_contour)
         {
             Rect box = boundingRect(c);
             ext_box.push_back(pair<Rect, Point>(box, c[0])); //TODO: Find better seed points
@@ -95,7 +95,7 @@ namespace mct
         findContours(img_bin, ext_contour, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 
         // find hull
-        for (auto c : ext_contour)
+        for (auto& c : ext_contour)
         {
             vector<int> hull_idx;
             vector<Point> hull;
@@ -117,7 +117,7 @@ namespace mct
             }
 
             int idx = defects[0][0];
-            for (auto d : defects)
+            for (auto& d : defects)
             {
                 while (idx <= d[0])
                 {
@@ -165,7 +165,7 @@ namespace mct
         drawContours(img_bin, hull_contour, -1, Scalar(CONTOUR_COLOR_L), FILLED, 8);
 
         vector<Frame> frames;
-        for (auto c : hull_contour)
+        for (auto& c : hull_contour)
         {
             if (contourArea(c) < 10) continue;
             Frame f = {img.size(), boundingRect(c), c};
@@ -187,13 +187,53 @@ namespace mct
     Mat createFrameMask(const Size& size, const vector<Frame>& frames)
     {
         Mat mask(size, CV_8UC1, Scalar(0));
-        for (Frame f : frames)
+        for (const Frame& f : frames)
         {
             if (!f.is_frame) continue;
             drawContours(mask, vector<vector<Point>>{ f.contour }, -1, Scalar(255), FILLED);
         }
         return mask;
     }
+
+    // Erase patterned frame from image for frame extraction
+    // TODO: Finish this, and implemment pattern inpainting
+    Mat erasePatternFrame(const Mat& image)
+    {
+        Mat img_clone = image.clone();
+        for (int i = 4; i < 5; i++)
+        {
+            Mat patch(image, Rect(1, 1, i, i));
+            Mat result;
+            matchTemplate(image, patch, result, TM_SQDIFF_NORMED);
+            normalize(result, result, 0, 1, NORM_MINMAX);
+            showImage(result);
+            matchTemplate(image, patch, result, TM_SQDIFF);
+            normalize(result, result, 0, 1, NORM_MINMAX);
+            showImage(result);
+            matchTemplate(image, patch, result, TM_CCORR);
+            normalize(result, result, 0, 1, NORM_MINMAX);
+            showImage(result);
+            matchTemplate(image, patch, result, TM_CCORR_NORMED);
+            normalize(result, result, 0, 1, NORM_MINMAX);
+            showImage(result);
+            //showImage(result);
+            resize(result, result, img_clone.size());
+            //showImage(result);
+            result.convertTo(result, CV_8UC1, 255);
+            //showImage(result);
+            Mat mask;
+            threshold(result, result, -1, 255, THRESH_OTSU);
+            bitwise_not(result, result);
+            showImage(result);
+            bitwise_or(img_clone, Scalar(255), img_clone, result);
+            cout << i << endl;
+            //showImage(patch, "image", 1);
+            //showImage(result, "image", 0.4);
+            //showImage(img_clone);
+        }
+        return img_clone;
+    }
+
     BoostFrameClassifier::BoostFrameClassifier(std::string str_model)
     {
         this->frameClassifier = Boost::loadFromString<Boost>(cv::String(str_model));

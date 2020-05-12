@@ -1,6 +1,7 @@
 #include "mct.h"
 #include "bubble.h"
 #include "frame.h"
+#include "text.h"
 #include "io.h"
 
 #include <opencv2/core.hpp>
@@ -21,13 +22,26 @@ int main()
     map<string, Mat> images = loadImages(selectImageFromDialog());
     Ptr<BoostFrameClassifier> frame_boost = new BoostFrameClassifier();
 
-    for (auto img : images)
+    for (auto& img : images)
     {
         Mat img_gray = toGrayScale(img.second);
-        vector<Frame> frames = extractFrame(img_gray);
 
+        auto timer = startTimer();
+        vector<Frame> frames = extractFrame(img_gray);
         frame_boost->classifyFrame(frames);
         cleanFrame(img_gray, frames);
+        cout << "Frame: " << stopTimer(timer) << endl;
+
+        timer = startTimer();
+        vector<Rect> text = findTextCandidate(img_gray);
+        cout << "Text: " << stopTimer(timer) << endl;
+
+        timer = startTimer();
+        vector<Bubble> bubbles = extractBubble(img_gray);
+        cleanBubble(img_gray, bubbles);
+        cout << "Bubble: " << stopTimer(timer) << endl;
+
+
         showImage(img_gray);
     }
 

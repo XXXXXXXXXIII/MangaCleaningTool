@@ -14,15 +14,20 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)bubble.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)frame.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)io.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)mct.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)text.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)bubble.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)bubble_boost_yaml.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)bubble_cascade_xml.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)frame.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)frame_boost_yaml.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)io.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)mct.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)text.h" />
   </ItemGroup>
 </Project>

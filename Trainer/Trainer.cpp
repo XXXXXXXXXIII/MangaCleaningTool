@@ -37,3 +37,6 @@ int main()
 
     boost->save(algorithm_file);
 }
+
+// String format command: 
+// cat frame_boost.yaml | sed -e 's/.*/R"(&)"/' > yaml.str

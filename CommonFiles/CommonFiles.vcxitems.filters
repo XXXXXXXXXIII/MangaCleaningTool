@@ -27,6 +27,15 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)frame_boost_yaml.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)bubble_cascade_xml.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)bubble_boost_yaml.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)text.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)mct.cpp">
@@ -37,6 +46,12 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)frame.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)bubble.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)text.cpp">
+      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -42,6 +42,11 @@ namespace mct
         waitKey(0);
     }
 
+    int getopt(int argc, char* const argv[], const char* optarg)
+    {
+        return 0;
+    }
+
     Mat toGrayScale(const Mat& img_in)
     {
         Mat img_gray = img_in.clone();
@@ -107,6 +112,42 @@ namespace mct
         }
 
         return 2;
+    }
+
+    /*
+        Checks two contour
+        return 0 if no intersect, 1 if r1 fully contain r2, -1 if r2 fully contain r1, 2 for partial
+        TODO: Make it more elegant
+    */
+    int compareContour(vector<Point>& c1, vector<Point>& c2)
+    {
+        Rect r1 = boundingRect(c1);
+        Rect r2 = boundingRect(c2);
+        Mat canvas1(Size(max(r1.width, r2.width), max(r1.height, r2.height)), CV_8UC1, Scalar(0));
+        Mat canvas2(Size(max(r1.width, r2.width), max(r1.height, r2.height)), CV_8UC1, Scalar(0));
+        drawContours(canvas1, { c1 }, -1, Scalar(255), FILLED);
+        drawContours(canvas2, { c2 }, -1, Scalar(255), FILLED);
+        bitwise_and(canvas1, canvas2, canvas1);
+        
+        vector<Point> result;
+        findContours(canvas1, result, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+
+        if (result.size() == 0)
+        {
+            return 0;
+        }
+        else if (contourArea(result) == contourArea(c2))
+        {
+            return 1;
+        }
+        else if (contourArea(result) == contourArea(c1))
+        {
+            return -1;
+        }
+        else
+        {
+            return 2;
+        }
     }
 
     /*
