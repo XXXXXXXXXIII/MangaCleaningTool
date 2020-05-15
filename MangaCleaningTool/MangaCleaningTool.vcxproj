@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
+  	<VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows-static</VcpkgTriplet>
+  	<VcpkgTriplet Condition="'$(Platform)'=='x64'">x64-windows-static</VcpkgTriplet>
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{3B5061A7-EDEB-4D5C-9E03-2AA26B546244}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -172,6 +174,5 @@
     <ClCompile Include="MangaCleanerSuzuki.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

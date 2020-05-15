@@ -1,5 +1,6 @@
 #include "mct.h"
 #include "bubble.h"
+#include "text.h"
 
 #include <opencv2/core.hpp>
 #include <opencv2/ml.hpp>
@@ -11,7 +12,7 @@ using namespace cv::ml;
 
 namespace mct
 {
-	vector<Bubble> extractBubble(const Mat& image)
+	vector<Bubble> findBubble(const Mat& image)
 	{
         Mat img_bin;
         const uchar bubbleColor = 180, bubbleColorH = 181;
@@ -56,8 +57,8 @@ namespace mct
         vector<int> blob_candidates;
         for (int i = 0; i < blobs.size(); ++i)
         {
-            if (blobs[i].width < 30 // TODO: Need a better guess here
-                || blobs[i].height < 30
+            if (blobs[i].width < 20 // TODO: Need a better guess here
+                || blobs[i].height < 20
                 || blobs[i].area() > areas[i] * 2
                 || blobs[i].area() > image.size().area() / 2)
             {
@@ -100,22 +101,30 @@ namespace mct
         return bubbles;
 	}
 
-    void cleanBubble(Mat& img, const vector<Bubble>& bubbles, uchar bubble_color)
+    void cleanBubble(Mat& img, const vector<Bubble>& bubbles, uchar bubble_color, const Point& offset)
     {
-        Mat bubble_mask = createBubbleMask(img.size(), bubbles);
+        Mat bubble_mask = createBubbleMask(img.size(), bubbles, 0, 255, offset);
         //Mat bubble_mask_inv;
         //bitwise_not(bubble_mask, bubble_mask_inv);
         //bitwise_and(img, bubble_mask, img);
+        bitwise_and(img, Scalar(0), img, bubble_mask);
         bitwise_or(img, Scalar(bubble_color), img, bubble_mask);
     }
 
-    Mat createBubbleMask(const Size& size, const vector<Bubble>& bubbles)
+    void extractBubble(Mat& img, const vector<Bubble>& bubbles, const uchar mask_color, const Point& offset)
     {
-        Mat mask(size, CV_8UC1, Scalar(0));
+        Mat mask = createBubbleMask(img.size(), bubbles, 255, 0, offset);
+        bitwise_and(img, Scalar(0), img, mask);
+        bitwise_or(img, Scalar(mask_color), img, mask);
+    }
+
+    Mat createBubbleMask(const Size& size, const vector<Bubble>& bubbles, const uchar back_color, const uchar bbl_color, const Point& offset)
+    {
+        Mat mask(size, CV_8UC1, Scalar(back_color));
         for (const Bubble& b : bubbles)
         {
             if (!b.is_bubble) continue;
-            drawContours(mask, vector<vector<Point>>{ b.contour }, -1, Scalar(255), FILLED);
+            drawContours(mask, vector<vector<Point>>{ b.contour }, -1, Scalar(bbl_color), FILLED, 8, noArray(), INT32_MAX, offset);
         }
         return mask;
     }

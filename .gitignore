@@ -339,3 +339,7 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 *.csv
+/MangaCleaningTool/chi_tra.traineddata
+/MangaCleaningTool/chi_tra_vert.traineddata
+/MangaCleaningTool/eng.traineddata
+/MangaCleaningTool/osd.traineddata

@@ -199,13 +199,14 @@ namespace mct
     //TODO: Optimize
 
     @param img_swt: CV32FC1
+    @param img_ccl: return CV32SC1
     @param loFillDiff: lower bound for connected pixel, as divisor
     @param hiFillDiff: upper bound for connected pixel, as multiplier
     @param scan_radius: look for connected pixels within this radius
 */
-    Mat connectSWTComponents(const Mat& img_swt, float loFillDiff, float hiFillDiff, int scan_radius)
+    int connectSWTComponents(const Mat& img_swt, Mat& img_ccl, float loFillDiff, float hiFillDiff, int scan_radius)
     {
-        Mat img_ccl(img_swt.size(), CV_32FC1, Scalar(-1));
+        img_ccl = Mat(img_swt.size(), CV_32SC1, Scalar(-1));
         int counter = 0;
         vector<int> labels;
         //vector<set<int>> labelGraph;
@@ -225,7 +226,7 @@ namespace mct
                     vector<int> neighborLabel;
                     for (Point n : neighbor)
                     {
-                        int v = img_ccl.at<float>(n);
+                        int v = img_ccl.at<int>(n);
                         if (v >= 0)
                         {
                             if (v < minLabel) minLabel = v;
@@ -237,9 +238,9 @@ namespace mct
                     {
                         for (Point n : neighbor)
                         {
-                            if (img_ccl.at<float>(n) < 0)
+                            if (img_ccl.at<int>(n) < 0)
                             {
-                                img_ccl.at<float>(n) = counter;
+                                img_ccl.at<int>(n) = counter;
                             }
                         }
                         labelGraph.push_back(counter);
@@ -260,9 +261,9 @@ namespace mct
                         }
                         for (Point n : neighbor)
                         {
-                            if (img_ccl.at<float>(n) < 0)
+                            if (img_ccl.at<int>(n) < 0)
                             {
-                                img_ccl.at<float>(n) = minLabel;
+                                img_ccl.at<int>(n) = minLabel;
                             }
                         }
                     }
@@ -272,6 +273,7 @@ namespace mct
             }
         }
 
+        vector<int> reduce;
         for (int i = 0; i < labelGraph.size(); i++)
         {
             int j = i;
@@ -279,6 +281,7 @@ namespace mct
             {
                 j = labelGraph[j];
             }
+            if (j == i) reduce.push_back(i);
             labelGraph[i] = j;
             //while (labelGraph[j].size() > 0 && *labelGraph[j].begin() < j)
             //{
@@ -288,9 +291,21 @@ namespace mct
             //labelGraph[i].insert(j);
         }
 
+        for (int& i : labelGraph) //TODO: Optimize
+        {
+            for (int j = 0; j < reduce.size(); j++)
+            {
+                if (i == reduce[j])
+                {
+                    i = j;
+                    break;
+                }
+            }
+        }
+
         for (int r = 0; r < img_swt.rows; r++)
         {
-            float* rptr = (float*)img_ccl.ptr<float>(r);
+            int* rptr = (int*)img_ccl.ptr<int>(r);
             for (int c = 0; c < img_swt.cols; c++)
             {
                 float label = rptr[c];
@@ -302,7 +317,7 @@ namespace mct
         }
 
         //showImage(img_swt, "image", 1, true);
-        return img_ccl;
+        return reduce.size();
     }
 
     /*
@@ -390,24 +405,101 @@ namespace mct
         return elected;
     }
 
-	vector<Rect> findTextCandidate(const Mat& image)
+	vector<Text> findTextCandidate(const Mat& image)
 	{
         Mat img_swt = strokeWidthTransform(image, 2.0, true);
         // 5, 5 seem to work the best
-        Mat img_ccl = connectSWTComponents(img_swt, 5, 5, 1); //TODO: Combine broken strokes into one character (i.e. こ)
-
-        //showImage(img_swt);
-        //showImage(img_ccl);
+        Mat img_ccl;
+        int nLabel = connectSWTComponents(img_swt, img_ccl, 5, 5, 1); //TODO: Combine broken strokes into one character (i.e. こ)
 
         //TODO: train text detector?
-        vector<Rect> boxes = textCandidateFilter(img_ccl);
+        //vector<Rect> boxes = textCandidateFilter(img_ccl);
+        vector<Text> text(nLabel);
+        
+        for (int r = 0; r < img_ccl.rows; r++)
+        {
+            const float* sptr = img_swt.ptr<const float>(r);
+            const int* cptr = img_ccl.ptr<const int>(r);
+            for (int c = 0; c < img_ccl.cols; c++)
+            {
+                int label = (int)cptr[c];
+                if (label < 0) continue;
 
-        //for (auto& b : boxes)
-        //{
-        //    rectangle(image, b, Scalar(120), 2);
-        //}
-        //showImage(image);
+                if (text[label].fill_area < 0)
+                {
+                    text[label].box = Rect(c, r, 1, 1);
+                    text[label].avg_width = sptr[c];
+                    text[label].fill_area = 1;
+                }
+                else
+                {
+                    text[label].fill_area++;
+                    text[label].avg_width += sptr[c];
 
-        return boxes;
+                    if (text[label].box.x > c)
+                        text[label].box.x = c;
+                    else if (text[label].box.br().x < c)
+                        text[label].box.width = c - text[label].box.x;
+
+                    if (text[label].box.y > r)
+                        text[label].box.y = r;
+                    else if (text[label].box.br().y < r)
+                        text[label].box.height = r - text[label].box.y;
+                }
+            }
+        }
+
+        for (Text& t : text)
+        {
+            t.avg_width /= t.fill_area;
+            rectangle(image, t.box, Scalar(120), 2);
+        }
+        showImage(image);
+
+        return text;
 	}
+
+    void TesseractTextDetector::detextBubbleTextLine(const Mat& image, const vector<Bubble>& bubbles)
+    {
+        namespace ts = tesseract;
+
+        Mat img_bin;
+        threshold(image, img_bin, -1, 255, THRESH_OTSU);
+        for (auto& b : bubbles)
+        {
+            Mat bbl(img_bin, b.box);
+            Mat bbl_clone = bbl.clone();
+            extractBubble(bbl_clone, { b }, 255, -b.box.tl());
+
+            tess.SetImage(bbl_clone.data, bbl_clone.cols, bbl_clone.rows, 1, bbl_clone.step1());
+            if (b.box.width > b.box.height)
+            {
+                tess.SetPageSegMode(ts::PageSegMode::PSM_SINGLE_BLOCK);
+            }
+            else
+            {
+                tess.SetPageSegMode(ts::PageSegMode::PSM_SINGLE_BLOCK_VERT_TEXT);
+            }
+            tess.SetSourceResolution(600);
+            tess.Recognize(0);
+            ts::ResultIterator* iter = tess.GetIterator();
+            ts::PageIteratorLevel level = ts::RIL_TEXTLINE;
+
+            if (iter != 0)
+            {
+                do
+                {
+                    const char* word = iter->GetUTF8Text(level);
+                    if (word == NULL) continue;
+                    float conf = iter->Confidence(level);
+                    int x1, y1, x2, y2;
+                    iter->BoundingBox(level, &x1, &y1, &x2, &y2);
+                    printf("word: '%s';  \tconf: %.2f; BoundingBox: %d,%d,%d,%d;\n", word, conf, x1, y1, x2, y2);
+                    rectangle(bbl, Rect(x1, y1, x2 - x1, y2 - y1), Scalar((uchar)255 - (255. * conf / 100)), 3);
+                    delete[] word;
+                } while (iter->Next(level));
+            }
+        }
+        showImage(img_bin);
+    }
 }
