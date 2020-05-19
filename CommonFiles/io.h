@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef __MCT_IO_H__
+#define __MCT_IO_H__
+
 #include <mct.h>
 
 #include <opencv2/core.hpp>
@@ -17,6 +20,8 @@ namespace mct
     void saveFrameProperty(std::vector<Frame>& frames);
     void saveBubbleProperty(std::vector<Bubble>& bubbles);
 
-    //void saveCutouts(const cv::Mat& image, std::vector<BubbleProperty>& bubble_prop, int width = 50, int height = 50);
-    //void saveCutouts(const cv::Mat& image, std::vector<cv::Rect>& rect, std::vector<bool>& tag, int width = 50, int height = 50);
+    void saveCutouts(const cv::Mat& image, std::vector<Bubble>& bubbles, int width = 50, int height = 50);
+    void saveCutouts(const cv::Mat& image, std::vector<cv::Rect>& rect, std::vector<bool>& tag, int width = 50, int height = 50);
 };
+
+#endif

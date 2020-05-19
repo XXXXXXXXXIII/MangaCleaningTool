@@ -14,6 +14,7 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)BoostBubbleClassifier.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)bubble.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)EASTTextDetector.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)frame.cpp" />

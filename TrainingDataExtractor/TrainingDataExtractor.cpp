@@ -16,25 +16,31 @@ using namespace cv;
 int main(int argc, char** argv)
 {
 	map<string, Mat> images = loadImages(selectImageFromDialog());
+	Ptr<MSERTextDetector> mser = new MSERTextDetector(); // Need filtering
+	Ptr<BoostFrameClassifier> frame_boost = new BoostFrameClassifier();
 
 	for (auto img : images)
 	{
 		Mat img_gray = toGrayScale(img.second);
 
-		if (true) // Extract frame
+		if (false) // Extract frame
 		{
 			vector<Frame> frames = extractFrame(img_gray);
 			manualFrameSorter(img_gray, frames);
 			saveFrameProperty(frames);
 		}
 
-		//Mat bubble_mask;
-		//findBubbleCandidate(img.second, bubble_mask, false);
-		//vector<Rect> text = findTextCandidate(img.second);
-		//vector<BubbleProperty> bprop = extractBubbleProperty(bubble_mask, text);
-		//manualSorter(img.second, bprop);
-		//saveBubbleProperty(bprop);
-		//saveCutouts(img.second, bprop, 100, 100);
+		if (true)
+		{
+			vector<Frame> frames = extractFrame(img_gray);
+			frame_boost->classifyFrame(frames);
+			cleanFrame(img_gray, frames);
+			vector<Bubble> bubbles = findBubble(img_gray);
+			mser->detectBubbleTextLine(img_gray, bubbles);
+			manualBubbleSorter(img_gray, bubbles);
+			saveBubbleProperty(bubbles);
+			saveCutouts(img_gray, bubbles, 100, 100);
+		}
 	}
 
 	cout << "All image processed!" << endl;

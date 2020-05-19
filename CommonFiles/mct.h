@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef __MCT_H__
+#define __MCT_H__
+
 #include <frame.h>
 #include <bubble.h>
 #include <text.h>
@@ -33,3 +36,5 @@ namespace mct
     std::chrono::steady_clock::time_point startTimer(void);
     double stopTimer(std::chrono::steady_clock::time_point startTime);
 };
+
+#endif

@@ -131,4 +131,57 @@ namespace mct
 
         outfile.close();
     }
+
+    void saveCutouts(const Mat& image, vector<Bubble>& bubbles, int width, int height)
+    {
+        vector<Rect> rect(bubbles.size());
+        vector<bool> tag(bubbles.size());
+        for (int i = 0; i < bubbles.size(); i++)
+        {
+            rect[i] = bubbles[i].box;
+            tag[i] = bubbles[i].is_bubble;
+        }
+
+        saveCutouts(image, rect, tag, width, height);
+    }
+
+
+    /*
+        Save rects from image as png files, used for training
+        Will rescale to 50 x 50 by default
+        Prepends "1_" to front of file name by default
+
+        @param width: width of the output image, 0 for no scaling
+        @param height: height of the output image, 0 for no scaling
+        @param manual_tagging: enable manually tagging image, support 0/1
+    */
+    void saveCutouts(const Mat& image, vector<Rect>& rect, vector<bool>& tag, int width, int height)
+    {
+        fs::path p = fs::current_path();
+        fs::create_directory(p.append("training_data"));
+        p.append("temp");
+        //srand(chrono::high_resolution_clock::now().time_since_epoch().count());
+
+        for (int i = 0; i < rect.size(); i++)
+        {
+            Rect r = rect[i];
+            string name = to_string(r.x) + to_string(r.y) + to_string(r.br().x) + to_string(r.br().y);
+            //cout << p.string() << endl;
+            Mat bbl(image, r);
+            Mat dst;
+            if (width > 0 && height > 0)
+            {
+                dst = Mat(Size(width, height), CV_8UC1);
+            }
+            else
+            {
+                dst = Mat(bbl.size(), CV_8UC1);
+            }
+            resize(bbl, dst, dst.size(), 0, 0, 0);
+
+            p.replace_filename(to_string(tag[i]) + "_" + name);
+            p.replace_extension(".png");
+            imwrite(p.string(), dst);
+        }
+    }
 }

@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef __MCT_FRAME_H__
+#define __MCT_FRAME_H__
+
 #include "frame_boost_yaml.h"
 
 #include <opencv2/core.hpp>
@@ -71,3 +74,5 @@ namespace mct
 		void classifyFrame(std::vector<Frame>& frames);
 	};
 };
+
+#endif

@@ -1,5 +1,5 @@
-#include "mct.h"
 #include "bubble.h"
+#include "mct.h"
 #include "text.h"
 
 #include <opencv2/core.hpp>
@@ -12,6 +12,76 @@ using namespace cv::ml;
 
 namespace mct
 {
+    std::vector<float> Bubble::toInputData()
+    {
+        double contour_area = cv::contourArea(contour);
+        std::vector<cv::Point> hull;
+        cv::convexHull(contour, hull);
+        cv::Moments m = cv::moments(contour, true);
+        double hu_moments[7];
+        cv::HuMoments(m, hu_moments);
+        for (int i = 0; i < 7; i++)
+        {
+            hu_moments[i] = -1 * std::copysign(1., hu_moments[i]) * log10(abs(hu_moments[i]));
+        }
+
+        float text_box_area = 0;
+        float text_stroke_area = 0;
+        float text_stroke_width = 0;
+        cv::Rect text_bound = Rect(0, 0, 0, 0);
+        if (text.size() > 0)
+        {
+            for (auto& t : text)
+            {
+                text_box_area += t.box.area();
+                text_stroke_area += t.fill_area;
+                text_stroke_width += t.fill_area * t.avg_width;
+                text_bound |= t.box;
+            }
+            if (text_stroke_area > 0) text_stroke_width /= text_stroke_area;
+        }
+
+        return std::vector<float>{
+            (float)box.width / page.width,
+                (float)box.height / page.height,
+                (float)contour_area / (float)cv::contourArea(hull),
+                (float)contour_area / box.area(),
+                (float)text_box_area / (float)contour_area,
+                (float)text_stroke_area / (float)contour_area,
+                (float)(text_bound.tl().x + text_bound.width / 2) / box.width,
+                (float)(text_bound.tl().y + text_bound.height / 2) / box.height,
+                (float)text_bound.width / box.width,
+                (float)text_bound.height / box.height,
+                (float)hu_moments[0],
+                (float)hu_moments[1],
+                (float)hu_moments[2],
+                (float)hu_moments[3]};
+    }
+
+    std::string Bubble::toCSVData()
+    {
+        std::vector<float> data = toInputData();
+        return std::to_string(is_bubble) + ", "
+            + std::to_string(data[0]) + ", "
+            + std::to_string(data[1]) + ", "
+            + std::to_string(data[2]) + ", "
+            + std::to_string(data[3]) + ", "
+            + std::to_string(data[4]) + ", "
+            + std::to_string(data[5]) + ", "
+            + std::to_string(data[6]) + ", "
+            + std::to_string(data[7]) + ", "
+            + std::to_string(data[8]) + ", "
+            + std::to_string(data[9]) + ", "
+            + std::to_string(data[10]) + ", "
+            + std::to_string(data[11]) + ", "
+            + std::to_string(data[12]) + ", "
+            + std::to_string(data[13]) + ", "
+            + std::to_string(data[14]) + ", "
+            + std::to_string(data[15]) + ", "
+            + std::to_string(data[16]) + ", "
+            + std::to_string(data[17]);
+    }
+
 	vector<Bubble> findBubble(const Mat& image)
 	{
         Mat img_bin;

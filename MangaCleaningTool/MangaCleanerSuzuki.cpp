@@ -24,6 +24,7 @@ int main()
 {
     map<string, Mat> images = loadImages(selectImageFromDialog());
     Ptr<BoostFrameClassifier> frame_boost = new BoostFrameClassifier();
+    Ptr<BoostBubbleClassifier> bubble_boost = new BoostBubbleClassifier();
     Ptr<TesseractTextDetector> tess = new TesseractTextDetector(); // Inefficient
     Ptr<MSERTextDetector> mser = new MSERTextDetector(); // Need filtering
     //Ptr<EASTTextDetector> east = new EASTTextDetector(); // Poor accuracy
@@ -31,9 +32,7 @@ int main()
     //tess.SetVariable("save_best_choices", "T");
     for (auto& img : images)
     {
-        Mat img_gray = toGrayScale(img.second);
-
-        
+        Mat img_gray = toGrayScale(img.second);        
 
         auto timer = startTimer();
         vector<Frame> frames = extractFrame(img_gray);
@@ -48,8 +47,9 @@ int main()
         timer = startTimer();
         
         //tess->detextBubbleTextLine(img_gray, bubbles);
-        mser->detectBubbleTextLine(img_gray, bubbles);
         //east->detectBubbleText(img.second, bubbles);        
+        mser->detectBubbleTextLine(img_gray, bubbles);
+        bubble_boost->classifyBubble(bubbles);
         cout << "Text: " << stopTimer(timer) << endl;
 
         cleanBubble(img_gray, bubbles);

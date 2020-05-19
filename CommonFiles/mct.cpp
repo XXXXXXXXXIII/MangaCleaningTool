@@ -19,7 +19,7 @@ namespace mct
         resize(image, img_out, Size(), size, size, INTER_LINEAR_EXACT);
         imshow(name, img_out);
         waitKey(0);
-        destroyWindow(name);
+        destroyAllWindows();
     }
 
     void showImageWithMouse(const Mat& image, float size)

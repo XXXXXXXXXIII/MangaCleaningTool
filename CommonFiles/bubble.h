@@ -1,5 +1,10 @@
 #pragma once
 
+#ifndef __MCT_BUBBLE_H__
+#define __MCT_BUBBLE_H__
+
+#include "text.h"
+
 #include "bubble_cascade_xml.h"
 #include "bubble_boost_yaml.h"
 
@@ -19,87 +24,8 @@ namespace mct
         std::vector<cv::Point> contour;
         std::vector<Text> text;
 
-        // relative width
-        // relative height
-        // convexity
-        // fill percentage (?)
-        // text coverage
-        // relative text location
-        // hu moments
-        std::vector<float> toInputData()
-        {
-            double contour_area = cv::contourArea(contour);
-            std::vector<cv::Point> hull;
-            cv::convexHull(contour, hull);
-            cv::Moments m = cv::moments(contour, true);
-            double hu_moments[7];
-            cv::HuMoments(m, hu_moments);
-            for (int i = 0; i < 7; i++)
-            {
-                hu_moments[i] = -1 * std::copysign(1., hu_moments[i]) * log10(abs(hu_moments[i]));
-            }
-
-            float text_box_area = 0;
-            float text_stroke_area = 0;
-            float text_stroke_width = 0;
-            Rect text_bound = text[0].box;
-            for (auto& t : text)
-            {
-                text_box_area += t.box.area();
-                text_stroke_area += t.fill_area;
-                text_stroke_width += t.fill_area * t.avg_width;
-                text_bound |= t.box;
-            }
-            text_stroke_width /= text_stroke_area;
-
-            return std::vector<float>{
-                (float)box.width / page.width,
-                    (float)box.height / page.height,
-                    (float)contour_area / (float)cv::contourArea(hull),
-                    (float)contour_area / box.area(),
-                    (float)text_box_area / box.area(),
-                    (float)text_stroke_area / box.area(),
-                    (float)text_stroke_width / min(box.width, box.height),
-                    (float)(text_bound.tl().x + text_bound.width / 2) / box.width,
-                    (float)(text_bound.tl().y + text_bound.height / 2) / box.height,
-                    (float)text_bound.width / box.width,
-                    (float)text_bound.height / box.height,
-                    (float)hu_moments[0],
-                    (float)hu_moments[1],
-                    (float)hu_moments[2],
-                    (float)hu_moments[3],
-                    (float)hu_moments[4],
-                    (float)hu_moments[5],
-                    (float)hu_moments[6]};
-        }
-
-        std::string toCSVData()
-        {
-            std::vector<float> data = toInputData();
-            return std::to_string(is_bubble) + ", "
-                + std::to_string(data[0]) + ", "
-                + std::to_string(data[1]) + ", "
-                + std::to_string(data[2]) + ", "
-                + std::to_string(data[3]) + ", "
-                + std::to_string(data[4]) + ", "
-                + std::to_string(data[5]) + ", "
-                + std::to_string(data[6]) + ", "
-                + std::to_string(data[7]) + ", "
-                + std::to_string(data[8]) + ", "
-                + std::to_string(data[9]) + ", "
-                + std::to_string(data[10]) + ", "
-                + std::to_string(data[11]) + ", "
-                + std::to_string(data[12]) + ", "
-                + std::to_string(data[13]) + ", "
-                + std::to_string(data[14]) + ", "
-                + std::to_string(data[15]) + ", "
-                + std::to_string(data[16]) + ", "
-                + std::to_string(data[17]) + ", "
-                + std::to_string(data[18]) + ", "
-                + std::to_string(data[19]) + ", "
-                + std::to_string(data[20]) + ", "
-                + std::to_string(data[21]);
-        }
+        std::string toCSVData();
+        std::vector<float> toInputData();
     };
 
     std::vector<Bubble> findBubble(const cv::Mat& image);
@@ -127,3 +53,5 @@ namespace mct
         void detectBubble(const cv::Mat& image, std::vector<Bubble>& bubbles);
     };
 }
+
+#endif

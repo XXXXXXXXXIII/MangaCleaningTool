@@ -59,6 +59,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MSERTextDetector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)BoostBubbleClassifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)frozen_east_text_detection.pb">

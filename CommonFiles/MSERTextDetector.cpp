@@ -207,10 +207,10 @@ namespace mct
                 b.text.push_back(t);
             }
 
-            for (auto& t : bubble_text)
-            {
-                rectangle(bbl, t.box, Scalar(180), 3);
-            }
+            //for (auto& t : bubble_text)
+            //{
+            //    rectangle(bbl, t.box, Scalar(180), 3);
+            //}
         }
         //showImage(image);
     }

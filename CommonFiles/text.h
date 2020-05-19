@@ -1,5 +1,10 @@
 #pragma once
 
+#ifndef __MCT_TEXT_H__
+#define __MCT_TEXT_H__
+
+#include "bubble.h"
+
 #include <opencv2/core.hpp>
 #include <opencv2/dnn.hpp>
 #include <opencv2/features2d.hpp>
@@ -8,7 +13,6 @@
 namespace mct
 {
 	struct Bubble;
-
 	struct Text
 	{
 		cv::Rect box;
@@ -78,3 +82,5 @@ namespace mct
 
 	};
 }
+
+#endif
