@@ -19,6 +19,7 @@ namespace mct
         resize(image, img_out, Size(), size, size, INTER_LINEAR_EXACT);
         imshow(name, img_out);
         waitKey(0);
+        destroyWindow(name);
     }
 
     void showImageWithMouse(const Mat& image, float size)
@@ -246,6 +247,21 @@ namespace mct
         for (int i = 0; i < frames.size(); i++)
         {
             frames[i].is_frame = tag[i];
+        }
+    }
+
+    void manualBubbleSorter(const Mat& image, vector<Bubble>& bubbles)
+    {
+        vector<Rect> rect(bubbles.size());
+        for (int i = 0; i < bubbles.size(); i++)
+        {
+            rect[i] = bubbles[i].box;
+        }
+
+        vector<bool> tag = manualSorter(image, rect, Size(-1, -1));
+        for (int i = 0; i < bubbles.size(); i++)
+        {
+            bubbles[i].is_bubble = tag[i];
         }
     }
 };

@@ -8,6 +8,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/ml.hpp>
+#include <opencv2/features2d.hpp>
 #include <tesseract/baseapi.h>
 
 #include <iostream>
@@ -23,7 +24,9 @@ int main()
 {
     map<string, Mat> images = loadImages(selectImageFromDialog());
     Ptr<BoostFrameClassifier> frame_boost = new BoostFrameClassifier();
-    Ptr<TesseractTextDetector> tess = new TesseractTextDetector();
+    Ptr<TesseractTextDetector> tess = new TesseractTextDetector(); // Inefficient
+    Ptr<MSERTextDetector> mser = new MSERTextDetector(); // Need filtering
+    //Ptr<EASTTextDetector> east = new EASTTextDetector(); // Poor accuracy
 
     //tess.SetVariable("save_best_choices", "T");
     for (auto& img : images)
@@ -44,16 +47,15 @@ int main()
 
         timer = startTimer();
         
-        tess->detextBubbleTextLine(img_gray, bubbles);
-        
+        //tess->detextBubbleTextLine(img_gray, bubbles);
+        mser->detectBubbleTextLine(img_gray, bubbles);
+        //east->detectBubbleText(img.second, bubbles);        
         cout << "Text: " << stopTimer(timer) << endl;
 
-
-
         cleanBubble(img_gray, bubbles);
-        //showImage(img_gray);
+        showImage(img_gray);
     }
 
-    waitKey(0);
+    cv::waitKey(0);
     return 0;
 }

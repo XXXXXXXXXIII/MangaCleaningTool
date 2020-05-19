@@ -21,7 +21,7 @@ namespace mct
 
         // CCL Filter
         Mat img_ccl(image.size(), CV_32S);
-        Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(3, 3));
+        Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(5, 5));
         //TODO: what if bubble have larger openings?
         morphologyEx(img_bin, img_bin, MORPH_OPEN, kernel, Point(-1, -1), 1);
         int nLabels = connectedComponents(img_bin, img_ccl, 4);
@@ -114,6 +114,8 @@ namespace mct
     void extractBubble(Mat& img, const vector<Bubble>& bubbles, const uchar mask_color, const Point& offset)
     {
         Mat mask = createBubbleMask(img.size(), bubbles, 255, 0, offset);
+        Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(3, 3));
+        morphologyEx(mask, mask, MORPH_DILATE, kernel, Point(-1, -1), 1);
         bitwise_and(img, Scalar(0), img, mask);
         bitwise_or(img, Scalar(mask_color), img, mask);
     }

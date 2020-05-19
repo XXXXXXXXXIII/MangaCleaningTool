@@ -3,6 +3,7 @@
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/dnn.hpp>
 
 using namespace cv;
 using namespace std;
@@ -31,10 +32,10 @@ namespace mct
         Mat img_gradY(image.size(), CV_32FC1);
         Mat img_swt(image.size(), CV_32FC1, Scalar(-1));
 
-        threshold(image, img_bin, 240, 255, THRESH_BINARY);
+        threshold(image, img_bin, 240, 255, THRESH_OTSU);
         img_bin.convertTo(img_float, CV_32FC1, 1. / 255.);
 
-        GaussianBlur(img_bin, img_bin, Size(5, 5), 0);
+        //GaussianBlur(img_bin, img_bin, Size(5, 5), 0);
         Canny(img_bin, img_edge, 128, 255); // Blur seem to run faster
 
         Scharr(img_float, img_gradX, -1, 1, 0);
@@ -459,7 +460,7 @@ namespace mct
         return text;
 	}
 
-    void TesseractTextDetector::detextBubbleTextLine(const Mat& image, const vector<Bubble>& bubbles)
+    void TesseractTextDetector::detextBubbleTextLine(const Mat& image, vector<Bubble>& bubbles)
     {
         namespace ts = tesseract;
 
@@ -471,7 +472,7 @@ namespace mct
             Mat bbl_clone = bbl.clone();
             extractBubble(bbl_clone, { b }, 255, -b.box.tl());
 
-            tess.SetImage(bbl_clone.data, bbl_clone.cols, bbl_clone.rows, 1, bbl_clone.step1());
+            tess.SetImage(bbl_clone.data, bbl_clone.cols, bbl_clone.rows, bbl_clone.elemSize1(), bbl_clone.step1());
             if (b.box.width > b.box.height)
             {
                 tess.SetPageSegMode(ts::PageSegMode::PSM_SINGLE_BLOCK);
@@ -489,17 +490,18 @@ namespace mct
             {
                 do
                 {
-                    const char* word = iter->GetUTF8Text(level);
-                    if (word == NULL) continue;
+                    //const char* word = iter->GetUTF8Text(level);
+                    //if (word == NULL) continue;
                     float conf = iter->Confidence(level);
                     int x1, y1, x2, y2;
                     iter->BoundingBox(level, &x1, &y1, &x2, &y2);
-                    printf("word: '%s';  \tconf: %.2f; BoundingBox: %d,%d,%d,%d;\n", word, conf, x1, y1, x2, y2);
+                    //printf("word: '%s';  \tconf: %.2f; BoundingBox: %d,%d,%d,%d;\n", word, conf, x1, y1, x2, y2);
                     rectangle(bbl, Rect(x1, y1, x2 - x1, y2 - y1), Scalar((uchar)255 - (255. * conf / 100)), 3);
-                    delete[] word;
+                    //delete[] word;
                 } while (iter->Next(level));
             }
         }
         showImage(img_bin);
     }
+
 }

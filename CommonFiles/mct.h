@@ -2,6 +2,7 @@
 
 #include <frame.h>
 #include <bubble.h>
+#include <text.h>
 #include <io.h>
 
 #include <opencv2/core.hpp>
@@ -15,7 +16,7 @@ namespace mct
     int tagImage(const cv::Mat& display_image);
     std::vector<bool> manualSorter(const cv::Mat& image, std::vector<cv::Rect>& rect, const cv::Size& display_size = cv::Size(100, 100));
     void manualFrameSorter(const cv::Mat& image, std::vector<Frame>& frames);
-    //void manualBubbleSorter(const cv::Mat& image, std::vector<BubbleProperty>& prop);
+    void manualBubbleSorter(const cv::Mat& image, std::vector<Bubble>& bubbles);
 
     int getopt(int argc, char** argv, char* optarg);
 

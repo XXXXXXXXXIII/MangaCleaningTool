@@ -52,7 +52,7 @@ namespace mct
                 files.push_back(filePath.string());
             }
         }
-
+        
         return files;
     }
 
@@ -94,7 +94,7 @@ namespace mct
 
         return images;
     }
-    void saveFrameProperty(std::vector<Frame> frames)
+    void saveFrameProperty(std::vector<Frame>& frames)
     {
         fs::path p = fs::current_path();
         p.append(frame_prop_file);
@@ -105,6 +105,25 @@ namespace mct
         outfile.open(p, ios::app);
 
         for (auto f : frames)
+        {
+            outfile << fixed << f.toCSVData() << endl;
+            cout << fixed << f.toCSVData() << endl;
+        }
+
+        outfile.close();
+    }
+
+    void saveBubbleProperty(std::vector<Bubble>& bubbles)
+    {
+        fs::path p = fs::current_path();
+        p.append(bubble_prop_file);
+        p.replace_extension(".csv");
+        cout << "Saving to " << p << endl;
+
+        ofstream outfile;
+        outfile.open(p, ios::app);
+
+        for (auto f : bubbles)
         {
             outfile << fixed << f.toCSVData() << endl;
             cout << fixed << f.toCSVData() << endl;

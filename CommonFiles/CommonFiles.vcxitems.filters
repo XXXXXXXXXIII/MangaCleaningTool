@@ -53,5 +53,16 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)text.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)EASTTextDetector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MSERTextDetector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)frozen_east_text_detection.pb">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

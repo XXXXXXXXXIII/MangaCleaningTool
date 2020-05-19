@@ -343,3 +343,4 @@ healthchecksdb
 /MangaCleaningTool/chi_tra_vert.traineddata
 /MangaCleaningTool/eng.traineddata
 /MangaCleaningTool/osd.traineddata
+*.gz
