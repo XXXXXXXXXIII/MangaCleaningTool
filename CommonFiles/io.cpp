@@ -11,6 +11,12 @@
 #include <fstream>
 #include <map>
 
+#include "psd_sdk/Psd.h"
+#include "psd_sdk/PsdPlatform.h"
+#include "psd_sdk/PsdMallocAllocator.h"
+#include "psd_sdk/PsdExport.h"
+#include "psd_sdk/PsdNativeFile.h"
+
 using namespace cv;
 using namespace std;
 namespace fs = std::filesystem;
@@ -183,5 +189,74 @@ namespace mct
             p.replace_extension(".png");
             imwrite(p.string(), dst);
         }
+    }
+
+    int writePSD(Mat& img_original, Mat& img_mask, string filename)
+    {
+        PSD_USING_NAMESPACE;
+
+        MallocAllocator allocator;
+        NativeFile file(&allocator);
+
+        fs::path filePath(filename);
+        filePath.replace_extension(".psd");
+
+        if (!file.OpenWrite(filePath.wstring().c_str()))
+        {
+            OutputDebugStringA("Cannot open file.\n");
+            return 1;
+        }
+
+        ExportDocument* document;
+        vector<Mat> ch_img;
+        split(img_original, ch_img);
+        if (ch_img.size() == 1) //TODO: Support other export format (RGB, 16u, 32f, etc)
+        {
+            document = CreateExportDocument(&allocator, img_original.cols, img_original.rows, 8u, exportColorMode::GRAYSCALE);
+            {
+                const unsigned int orig = AddLayer(document, &allocator, "Original");
+                const unsigned int mask = AddLayer(document, &allocator, "Clean Mask");
+
+                UpdateLayer(document, &allocator, orig, exportChannel::GRAY, 0, 0, img_original.cols, img_original.rows, (uchar*)ch_img[0].data, compressionType::RLE);
+
+                vector<Mat> ch_mask;
+                split(img_mask, ch_mask);
+                UpdateLayer(document, &allocator, mask, exportChannel::GRAY, 0, 0, img_mask.cols, img_mask.rows, (uchar*)ch_mask[0].data, compressionType::RLE);
+                UpdateLayer(document, &allocator, mask, exportChannel::ALPHA, 0, 0, img_mask.cols, img_mask.rows, (uchar*)ch_mask[1].data, compressionType::RLE);
+
+                cout << "Writing to file: " << filePath.filename() << endl;
+                WriteDocument(document, &allocator, &file);
+
+                DestroyExportDocument(document, &allocator);
+            }
+        }
+        else if (ch_img.size() == 3)
+        {
+            document = CreateExportDocument(&allocator, img_original.cols, img_original.rows, 8u, exportColorMode::RGB);
+            {
+                const unsigned int orig = AddLayer(document, &allocator, "Original");
+                const unsigned int mask = AddLayer(document, &allocator, "Clean Mask");
+
+                UpdateLayer(document, &allocator, orig, exportChannel::RED, 0, 0, img_original.cols, img_original.rows, (uchar*)ch_img[0].data, compressionType::RLE);
+                UpdateLayer(document, &allocator, orig, exportChannel::GREEN, 0, 0, img_original.cols, img_original.rows, (uchar*)ch_img[1].data, compressionType::RLE);
+                UpdateLayer(document, &allocator, orig, exportChannel::BLUE, 0, 0, img_original.cols, img_original.rows, (uchar*)ch_img[2].data, compressionType::RLE);
+
+                vector<Mat> ch_mask;
+                split(img_mask, ch_mask);
+                UpdateLayer(document, &allocator, mask, exportChannel::RED, 0, 0, img_mask.cols, img_mask.rows, (uchar*)ch_mask[0].data, compressionType::RLE);
+                UpdateLayer(document, &allocator, mask, exportChannel::GREEN, 0, 0, img_mask.cols, img_mask.rows, (uchar*)ch_mask[0].data, compressionType::RLE);
+                UpdateLayer(document, &allocator, mask, exportChannel::BLUE, 0, 0, img_mask.cols, img_mask.rows, (uchar*)ch_mask[0].data, compressionType::RLE);
+                UpdateLayer(document, &allocator, mask, exportChannel::ALPHA, 0, 0, img_mask.cols, img_mask.rows, (uchar*)ch_mask[1].data, compressionType::RLE);
+
+                cout << "Writing to file: " << filePath.filename() << endl;
+                WriteDocument(document, &allocator, &file);
+
+                DestroyExportDocument(document, &allocator);
+            }
+        }
+
+        file.Close();
+
+        return 0;
     }
 }

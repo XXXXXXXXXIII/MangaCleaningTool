@@ -15,7 +15,7 @@ namespace mct
 
     std::vector<std::string> selectImageFromDialog(void);
     std::map<std::string, cv::Mat> loadImages(const std::vector<std::string>& filenames);
-    //int writePSD(cv::Mat& img_original, cv::Mat& img_mask, std::string filename);
+    int writePSD(cv::Mat& img_original, cv::Mat& img_mask, std::string filename);
 
     void saveFrameProperty(std::vector<Frame>& frames);
     void saveBubbleProperty(std::vector<Bubble>& bubbles);

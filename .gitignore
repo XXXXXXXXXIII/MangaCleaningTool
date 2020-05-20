@@ -344,3 +344,4 @@ healthchecksdb
 /MangaCleaningTool/eng.traineddata
 /MangaCleaningTool/osd.traineddata
 *.gz
+*.yaml

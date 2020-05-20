@@ -60,7 +60,7 @@ namespace mct
 
 	std::vector<Frame> extractFrame(const cv::Mat& image);
 	void cleanFrame(cv::Mat& img, const std::vector<Frame>& frames, uchar back_color = 255);
-	cv::Mat createFrameMask(const cv::Size& size, const std::vector<Frame>& frames);
+	cv::Mat createFrameMask(const cv::Size& size, const std::vector<Frame>& frames, const uchar back_color = 0, const uchar mask_color = 255);
 	cv::Mat erasePatternFrame(const cv::Mat& image);
 
 	class BoostFrameClassifier

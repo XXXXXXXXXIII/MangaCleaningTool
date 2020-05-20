@@ -44,16 +44,32 @@ int main()
         vector<Bubble> bubbles = findBubble(img_gray);
         cout << "Bubble: " << stopTimer(timer) << endl;
 
-        timer = startTimer();
         
+        timer = startTimer();
         //tess->detextBubbleTextLine(img_gray, bubbles);
         //east->detectBubbleText(img.second, bubbles);        
         mser->detectBubbleTextLine(img_gray, bubbles);
-        bubble_boost->classifyBubble(bubbles);
         cout << "Text: " << stopTimer(timer) << endl;
 
+        timer = startTimer();
+        bubble_boost->classifyBubble(bubbles);
+        cout << "Bubble Classifier: " << stopTimer(timer) << endl;
+
         cleanBubble(img_gray, bubbles);
-        showImage(img_gray);
+        //showImage(img_gray, "image", 0.3);
+
+
+        Mat img_mask(img.second.size(), CV_8UC2);
+        vector<Mat> ch_mask;
+        split(img_mask, ch_mask);
+        bitwise_and(createBubbleMask(img.second.size(), bubbles),
+            createFrameMask(img.second.size(), frames), ch_mask[0]);
+        bitwise_or(ch_mask[0], ch_mask[1], ch_mask[1]);
+        merge(ch_mask, img_mask);
+
+
+
+        writePSD(img.second, img_mask, img.first);
     }
 
     cv::waitKey(0);

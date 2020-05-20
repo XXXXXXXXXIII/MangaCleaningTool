@@ -84,6 +84,26 @@ namespace mct
 
 	vector<Bubble> findBubble(const Mat& image)
 	{
+        //for (float i = 0; i < 10; i+=1)
+        //{
+            //Ptr<MSER> mser = MSER::create(30, 
+            //    image.size().area() / 3000, 
+            //    image.size().area() / 10, 
+            //    5);
+            //vector<vector<Point>> pts;
+            //vector<Rect> box;
+            //Mat img = image.clone();
+            //bilateralFilter(image, img, 5, 50, 50);
+            //threshold(img, img, 240, 255, THRESH_BINARY);
+            //mser->detectRegions(image, pts, box);
+            //for (auto& b : box)
+            //{
+            //    rectangle(img, b, Scalar(180), 2);
+            //}
+            ////cout << i << endl;
+            //showImage(img, "", 0.3);
+        //}
+
         Mat img_bin;
         const uchar bubbleColor = 180, bubbleColorH = 181;
         bilateralFilter(image, img_bin, 5, 50, 50); // Remove noise on image //TODO: Find better simga value

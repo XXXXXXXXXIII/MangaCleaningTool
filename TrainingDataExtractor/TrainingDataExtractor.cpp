@@ -29,8 +29,7 @@ int main(int argc, char** argv)
 			manualFrameSorter(img_gray, frames);
 			saveFrameProperty(frames);
 		}
-
-		if (true)
+		else
 		{
 			vector<Frame> frames = extractFrame(img_gray);
 			frame_boost->classifyFrame(frames);

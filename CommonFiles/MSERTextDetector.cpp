@@ -13,10 +13,11 @@ namespace mct
 {
     vector<Text> MSERTextDetector::detectTextLine(const Mat& image)
     {
-        Mat img_bin;
+        Mat img_bin = image.clone();
         bitwise_not(image, img_bin);
-        threshold(img_bin, img_bin, 64, 255, THRESH_OTSU);
+        threshold(img_bin, img_bin, 32, 255, THRESH_TOZERO);
         bitwise_not(img_bin, img_bin);
+        //showImage(img_bin);
 
         vector<Text> text;
         vector<vector<Point>> point;
@@ -98,9 +99,9 @@ namespace mct
         //for (auto& l : text_line_final)
         //{
         //    rectangle(image, l.box, Scalar(180), 4);
-        //    cout << l.avg_width << " , " << l.fill_area << endl;
-        //showImage(image);
+        //    //cout << l.avg_width << " , " << l.fill_area << endl;
         //}
+        //showImage(image);
 
         return text_line_final;
     }
@@ -212,6 +213,6 @@ namespace mct
             //    rectangle(bbl, t.box, Scalar(180), 3);
             //}
         }
-        //showImage(image);
+        //showImage(image, "", 0.3);
     }
 }

@@ -14,10 +14,10 @@ using namespace cv::ml;
 
 int main()
 {
-    //string training_data_file = "frame_property.csv";
-    string training_data_file = "bubble_property.csv";
-    //string algorithm_file = "frame_boost.yaml";
-    string algorithm_file = "bubble_boost.yaml";
+    string training_data_file = "frame_property.csv";
+    //string training_data_file = "bubble_property.csv";
+    string algorithm_file = "frame_boost.yaml";
+    //string algorithm_file = "bubble_boost.yaml";
     Ptr<TrainData> training_data = TrainData::loadFromCSV(training_data_file, 0, 0, 1);
     //Ptr<LogisticRegression> lr = LogisticRegression::create();
     //lr->setLearningRate(0.001);

@@ -10,6 +10,9 @@
     <Filter Include="Resource Files">
       <UniqueIdentifier>{022e0d74-6c15-4bc8-8a7e-b6c6f558ce3b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="psd_sdk">
+      <UniqueIdentifier>{2528d971-f004-48f2-9e9f-395f803038a5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)bubble.h">
@@ -35,6 +38,189 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)text.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\Psd.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdAllocator.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdAlphaChannel.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdAssert.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdBitUtil.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdBlendMode.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdChannel.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdChannelType.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdColorMode.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdColorModeDataSection.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdCompilerMacros.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdCompressionType.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdDecompressRle.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdDocument.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdDocumentation.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdEndianConversion.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdExport.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdExportChannel.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdExportColorMode.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdExportDocument.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdExportLayer.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdExportMetaDataAttribute.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdFile.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdFixedSizeString.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdImageDataSection.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdImageResourcesSection.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdImageResourceType.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdInterleave.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\Psdinttypes.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\Psdispod.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\Psdisunsigned.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdKey.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdLayer.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdLayerCanvasCopy.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdLayerMask.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdLayerMaskSection.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdLayerType.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdLog.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdMallocAllocator.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdMemoryUtil.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\Psdminiz.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdNamespace.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdNativeFile.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdNativeFile_Mac.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdParseColorModeDataSection.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdParseDocument.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdParseImageDataSection.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdParseImageResourcesSection.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdParseLayerMaskSection.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdPch.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdPlanarImage.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdPlatform.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdSection.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\Psdstdint.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdSyncFileReader.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdSyncFileUtil.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdSyncFileWriter.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdThumbnail.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdTypes.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdUnionCast.h">
+      <Filter>psd_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdVectorMask.h">
+      <Filter>psd_sdk</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -62,10 +248,88 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)BoostBubbleClassifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdAllocator.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdBlendMode.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdColorMode.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdDecompressRle.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdExport.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdFile.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdFixedSizeString.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdInterleave.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdLayerCanvasCopy.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdMallocAllocator.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdNativeFile.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdParseColorModeDataSection.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdParseDocument.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdParseImageDataSection.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdParseImageResourcesSection.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdParseLayerMaskSection.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdPch.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdSyncFileReader.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdSyncFileWriter.cpp">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\Psdminiz.c">
+      <Filter>psd_sdk</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)frozen_east_text_detection.pb">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)psd_sdk\PsdBitUtil.inl">
+      <Filter>psd_sdk</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)psd_sdk\PsdEndianConversion.inl">
+      <Filter>psd_sdk</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)psd_sdk\PsdMemoryUtil.inl">
+      <Filter>psd_sdk</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)psd_sdk\PsdSyncFileUtil.inl">
+      <Filter>psd_sdk</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)psd_sdk\PsdUnionCast.inl">
+      <Filter>psd_sdk</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)psd_sdk\PsdNativeFile_Mac.mm">
+      <Filter>psd_sdk</Filter>
     </None>
   </ItemGroup>
 </Project>

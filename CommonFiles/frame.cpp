@@ -184,13 +184,13 @@ namespace mct
         bitwise_or(img, Scalar(back_color), img, frame_mask_inv);
     }
 
-    Mat createFrameMask(const Size& size, const vector<Frame>& frames)
+    Mat createFrameMask(const Size& size, const vector<Frame>& frames, const uchar back_color, const uchar mask_color)
     {
-        Mat mask(size, CV_8UC1, Scalar(0));
+        Mat mask(size, CV_8UC1, Scalar(back_color));
         for (const Frame& f : frames)
         {
             if (!f.is_frame) continue;
-            drawContours(mask, vector<vector<Point>>{ f.contour }, -1, Scalar(255), FILLED);
+            drawContours(mask, vector<vector<Point>>{ f.contour }, -1, Scalar(mask_color), FILLED);
         }
         return mask;
     }
