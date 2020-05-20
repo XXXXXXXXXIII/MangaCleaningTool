@@ -34,14 +34,14 @@ namespace mct
     void extractBubble(cv::Mat& img, const std::vector<Bubble>& bubbles, const uchar mask_color = 255, const cv::Point& offset = cv::Point(0,0));
     cv::Mat createBubbleMask(const cv::Size& size, const std::vector<Bubble>& bubbles, const uchar back_color = 0, const uchar bbl_color = 255, const cv::Point& offset = cv::Point(0, 0));
 
-    class MSERBubbleDetector
-    {
-    private:
-        cv::Ptr<cv::MSER> mser;
-    public:
-        MSERBubbleDetector();
-        std::vector<Bubble> detectBubble(const cv::Mat& image);
-    };
+    //class MSERBubbleDetector
+    //{
+    //private:
+    //    cv::Ptr<cv::MSER> mser;
+    //public:
+    //    MSERBubbleDetector();
+    //    std::vector<Bubble> detectBubble(const cv::Mat& image);
+    //};
 
     class BoostBubbleClassifier
     {
@@ -53,15 +53,15 @@ namespace mct
         void classifyBubble(std::vector<Bubble>& bubbles);
     };
 
-    class CascadeBubbleDetector
-    {
-    private:
-        cv::CascadeClassifier bubbleDetector;
+    //class CascadeBubbleDetector
+    //{
+    //private:
+    //    cv::CascadeClassifier bubbleDetector;
 
-    public:
-        CascadeBubbleDetector(std::string cascade_file = bubble_cascade_model);
-        void detectBubble(const cv::Mat& image, std::vector<Bubble>& bubbles);
-    };
+    //public:
+    //    CascadeBubbleDetector(std::string cascade_file = bubble_cascade_model);
+    //    void detectBubble(const cv::Mat& image, std::vector<Bubble>& bubbles);
+    //};
 }
 
 #endif
