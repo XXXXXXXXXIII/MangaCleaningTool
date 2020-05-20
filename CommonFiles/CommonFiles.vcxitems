@@ -20,6 +20,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)frame.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)io.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)mct.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MSERBubbleDetector.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MSERTextDetector.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdAllocator.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdBlendMode.cpp" />

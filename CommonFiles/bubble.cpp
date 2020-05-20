@@ -82,109 +82,96 @@ namespace mct
             + std::to_string(data[17]);
     }
 
-	vector<Bubble> findBubble(const Mat& image)
+    /*
+        Find connected components for the image. 
+        Sweep through several erosion level to close any openings.
+        //TODO: Support non-white bubble
+        //TODO: Remove overlapping bubbles
+    */
+	vector<Bubble> findBubbleCandidate(const Mat& image)
 	{
-        //for (float i = 0; i < 10; i+=1)
-        //{
-            //Ptr<MSER> mser = MSER::create(30, 
-            //    image.size().area() / 3000, 
-            //    image.size().area() / 10, 
-            //    5);
-            //vector<vector<Point>> pts;
-            //vector<Rect> box;
-            //Mat img = image.clone();
-            //bilateralFilter(image, img, 5, 50, 50);
-            //threshold(img, img, 240, 255, THRESH_BINARY);
-            //mser->detectRegions(image, pts, box);
-            //for (auto& b : box)
-            //{
-            //    rectangle(img, b, Scalar(180), 2);
-            //}
-            ////cout << i << endl;
-            //showImage(img, "", 0.3);
-        //}
-
-        Mat img_bin;
-        const uchar bubbleColor = 180, bubbleColorH = 181;
-        bilateralFilter(image, img_bin, 5, 50, 50); // Remove noise on image //TODO: Find better simga value
-        threshold(img_bin, img_bin, 240, 255, THRESH_BINARY); // threshold 240 as recommended in the paper
-
-        // CCL Filter
-        Mat img_ccl(image.size(), CV_32S);
-        Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(5, 5));
-        //TODO: what if bubble have larger openings?
-        morphologyEx(img_bin, img_bin, MORPH_OPEN, kernel, Point(-1, -1), 1);
-        int nLabels = connectedComponents(img_bin, img_ccl, 4);
-        vector<Rect> blobs(nLabels);
-        vector<int> areas(nLabels);
-        vector<Point> seedPoints(nLabels);
-
-        for (int y = 0; y < img_ccl.rows; y++) {
-            for (int x = 0; x < img_ccl.cols; x++) {
-                int label = img_ccl.at<int>(y, x);
-                areas[label]++;
-                if (blobs[label].empty())
-                {
-                    seedPoints[label] = Point(x, y);
-                    blobs[label] = Rect(x, y, 1, 1);
-                }
-                else
-                {
-                    if (blobs[label].x > x)
-                        blobs[label].x = x;
-                    else if (blobs[label].x + blobs[label].width < x)
-                        blobs[label].width = x - blobs[label].x;
-
-                    if (blobs[label].y > y)
-                        blobs[label].y = y;
-                    else if (blobs[label].y + blobs[label].height < y)
-                        blobs[label].height = y - blobs[label].y;
-                }
-            }
-        }
-
-        // Basic filter
-        vector<int> blob_candidates;
-        for (int i = 0; i < blobs.size(); ++i)
-        {
-            if (blobs[i].width < 20 // TODO: Need a better guess here
-                || blobs[i].height < 20
-                || blobs[i].area() > areas[i] * 2
-                || blobs[i].area() > image.size().area() / 2)
-            {
-                continue;
-            }
-            blob_candidates.push_back(i);
-        }
-
-        for (int i : blob_candidates)
-        {
-            Rect r = blobs[i];
-
-            if (img_bin.at<uchar>(seedPoints[i]) != bubbleColor)
-            {
-                Rect fillBox;
-                floodFill(img_bin, seedPoints[i], Scalar(bubbleColor), &fillBox);
-                //rectangle(img_bin, blobs[i], Scalar(100), 2);
-                //blob_elected.push_back(fillBox);
-            }
-        }
-
-        inRange(img_bin, Scalar(bubbleColor), Scalar(bubbleColorH), img_bin);
-
-        vector<vector<Point>> contours;
-        vector<Vec4i> hierarchy;
         vector<Bubble> bubbles;
-        findContours(img_bin, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
-        // HACK: Only select contour whose child does not have child (aka bubble with text), seem to work
-        for (int i = 0; i < hierarchy.size(); i++)
+        for (int s = 1; s <= 9; s += 2) //HACK: sweep through different erosion level to close bubble openings
         {
-            Vec4i h = hierarchy[i];
-            if (h[2] > 0 && hierarchy[h[2]][2] < 0)
+            Mat img_bin, img_ccl;
+            const uchar bubbleColor = 180, bubbleColorH = 181;
+            bilateralFilter(image, img_bin, 5, 50, 50); // Remove noise on image //TODO: Find better simga value
+            threshold(img_bin, img_bin, 240, 255, THRESH_BINARY); // threshold 240 as recommended in the paper
+
+            // CCL Filter
+            Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(s, s));
+            morphologyEx(img_bin, img_bin, MORPH_ERODE, kernel, Point(-1, -1), 1);
+            int nLabels = connectedComponents(img_bin, img_ccl, 4);
+            vector<Rect> blobs(nLabels);
+            vector<int> areas(nLabels);
+            vector<Point> seedPoints(nLabels);
+
+            for (int y = 0; y < img_ccl.rows; y++) {
+                for (int x = 0; x < img_ccl.cols; x++) {
+                    int label = img_ccl.at<int>(y, x);
+                    areas[label]++;
+                    if (blobs[label].empty())
+                    {
+                        seedPoints[label] = Point(x, y);
+                        blobs[label] = Rect(x, y, 1, 1);
+                    }
+                    else
+                    {
+                        if (blobs[label].x > x)
+                            blobs[label].x = x;
+                        else if (blobs[label].x + blobs[label].width < x)
+                            blobs[label].width = x - blobs[label].x;
+
+                        if (blobs[label].y > y)
+                            blobs[label].y = y;
+                        else if (blobs[label].y + blobs[label].height < y)
+                            blobs[label].height = y - blobs[label].y;
+                    }
+                }
+            }
+
+            // Basic filter
+            vector<int> blob_candidates;
+            for (int i = 0; i < blobs.size(); ++i)
             {
-                Bubble bubble = { true, image.size(), boundingRect(contours[i]), contours[i] };
-                bubbles.push_back(bubble);
-                //drawContours(bubble_mask, contours, i, Scalar(128), FILLED);
+                if (blobs[i].width < 20 // TODO: Need a better guess here
+                    || blobs[i].height < 20
+                    || blobs[i].area() > areas[i] * 4
+                    || blobs[i].area() > image.size().area() / 2)
+                {
+                    continue;
+                }
+                blob_candidates.push_back(i);
+            }
+
+            for (int i : blob_candidates)
+            {
+                Rect r = blobs[i];
+
+                if (img_bin.at<uchar>(seedPoints[i]) != bubbleColor)
+                {
+                    Rect fillBox;
+                    floodFill(img_bin, seedPoints[i], Scalar(bubbleColor), &fillBox);
+                    //rectangle(img_bin, blobs[i], Scalar(100), 2);
+                    //blob_elected.push_back(fillBox);
+                }
+            }
+
+            inRange(img_bin, Scalar(bubbleColor), Scalar(bubbleColorH), img_bin);
+
+            vector<vector<Point>> contours;
+            vector<Vec4i> hierarchy;
+            findContours(img_bin, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
+            // HACK: Only select contour whose child does not have child (aka bubble with text), seem to work
+            for (int i = 0; i < hierarchy.size(); i++)
+            {
+                Vec4i h = hierarchy[i];
+                if (h[2] > 0 && hierarchy[h[2]][2] < 0)
+                {
+                    Bubble bubble = { true, image.size(), boundingRect(contours[i]), contours[i] };
+                    bubbles.push_back(bubble);
+                    //drawContours(bubble_mask, contours, i, Scalar(128), FILLED);
+                }
             }
         }
 

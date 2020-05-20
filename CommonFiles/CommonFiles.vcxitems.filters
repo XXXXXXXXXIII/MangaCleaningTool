@@ -308,6 +308,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\Psdminiz.c">
       <Filter>psd_sdk</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MSERBubbleDetector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)frozen_east_text_detection.pb">

@@ -175,7 +175,7 @@ namespace mct
         return frames;
     }
 
-    void cleanFrame(Mat& img, const vector<Frame>& frames, uchar back_color)
+    void cleanFrame(Mat& img, const vector<Frame>& frames, uchar back_color) //TOOD: Update function
     {
         Mat frame_mask = createFrameMask(img.size(), frames);
         Mat frame_mask_inv;

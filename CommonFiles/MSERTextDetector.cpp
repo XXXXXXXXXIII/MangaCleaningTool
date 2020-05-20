@@ -202,17 +202,13 @@ namespace mct
             Mat bbl_clone = bbl.clone();
             extractBubble(bbl_clone, { b }, 255, -b.box.tl());
 
-            vector<Text> bubble_text = detectTextLine(bbl_clone);
-            for (auto& t : bubble_text)
-            {
-                b.text.push_back(t);
-            }
+            b.text = detectTextLine(bbl_clone);
 
-            //for (auto& t : bubble_text)
-            //{
-            //    rectangle(bbl, t.box, Scalar(180), 3);
-            //}
+            /*for (auto& t : bubble_text)
+            {
+                rectangle(bbl, t.box, Scalar(180), 3);
+            }*/
         }
-        //showImage(image, "", 0.3);
+        //showImage(image, "", 0.6);
     }
 }
