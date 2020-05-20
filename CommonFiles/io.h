@@ -13,9 +13,9 @@ namespace mct
     const std::string bubble_prop_file = "bubble_property.csv";
     const std::string frame_prop_file = "frame_property.csv";
 
-    std::vector<std::string> selectImageFromDialog(void);
-    std::map<std::string, cv::Mat> loadImages(const std::vector<std::string>& filenames);
-    int writePSD(cv::Mat& img_original, cv::Mat& img_mask, std::string filename);
+    std::vector<std::wstring> selectImageFromDialog(void);
+    std::map<std::wstring, cv::Mat> loadImages(const std::vector<std::wstring>& filenames);
+    int writePSD(const cv::Mat& img_original, const cv::Mat& img_mask, std::wstring filename);
 
     void saveFrameProperty(std::vector<Frame>& frames);
     void saveBubbleProperty(std::vector<Bubble>& bubbles);

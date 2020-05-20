@@ -22,11 +22,12 @@ namespace ts = tesseract;
 
 int main()
 {
-    map<string, Mat> images = loadImages(selectImageFromDialog());
+    map<wstring, Mat> images = loadImages(selectImageFromDialog());
     Ptr<BoostFrameClassifier> frame_boost = new BoostFrameClassifier();
     Ptr<BoostBubbleClassifier> bubble_boost = new BoostBubbleClassifier();
     Ptr<TesseractTextDetector> tess = new TesseractTextDetector(); // Inefficient
-    Ptr<MSERTextDetector> mser = new MSERTextDetector(); // Need filtering
+    Ptr<MSERTextDetector> text_mser = new MSERTextDetector(); // Need filtering
+    Ptr<MSERBubbleDetector> bubble_mser = new MSERBubbleDetector();
     //Ptr<EASTTextDetector> east = new EASTTextDetector(); // Poor accuracy
 
     //tess.SetVariable("save_best_choices", "T");
@@ -37,18 +38,18 @@ int main()
         auto timer = startTimer();
         vector<Frame> frames = extractFrame(img_gray);
         frame_boost->classifyFrame(frames);
-        cleanFrame(img_gray, frames);
+        //cleanFrame(img_gray, frames);
         cout << "Frame: " << stopTimer(timer) << endl;
 
         timer = startTimer();
-        vector<Bubble> bubbles = findBubble(img_gray);
+        vector<Bubble> bubbles = findBubbleCandidate(img_gray);
+        //bubble_mser->detectBubble(img_gray);
         cout << "Bubble: " << stopTimer(timer) << endl;
-
         
         timer = startTimer();
         //tess->detextBubbleTextLine(img_gray, bubbles);
         //east->detectBubbleText(img.second, bubbles);        
-        mser->detectBubbleTextLine(img_gray, bubbles);
+        text_mser->detectBubbleTextLine(img_gray, bubbles);
         cout << "Text: " << stopTimer(timer) << endl;
 
         timer = startTimer();
@@ -56,20 +57,18 @@ int main()
         cout << "Bubble Classifier: " << stopTimer(timer) << endl;
 
         cleanBubble(img_gray, bubbles);
-        //showImage(img_gray, "image", 0.3);
+        showImage(img_gray, "image", 0.5);
 
 
         Mat img_mask(img.second.size(), CV_8UC2);
         vector<Mat> ch_mask;
         split(img_mask, ch_mask);
-        bitwise_and(createBubbleMask(img.second.size(), bubbles),
-            createFrameMask(img.second.size(), frames), ch_mask[0]);
+        bitwise_or(createBubbleMask(img.second.size(), bubbles, 0, 255),
+            createFrameMask(img.second.size(), frames, 255, 0), ch_mask[0]);
         bitwise_or(ch_mask[0], ch_mask[1], ch_mask[1]);
         merge(ch_mask, img_mask);
 
-
-
-        writePSD(img.second, img_mask, img.first);
+        //writePSD(toGrayScale(img.second), img_mask, img.first);
     }
 
     cv::waitKey(0);

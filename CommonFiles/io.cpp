@@ -23,7 +23,7 @@ namespace fs = std::filesystem;
 
 namespace mct
 {
-    vector<string> selectImageFromDialog(void)
+    vector<wstring> selectImageFromDialog(void)
     {
         wchar_t filename[2560] = {'\0'};
 
@@ -37,7 +37,7 @@ namespace mct
         ofn.lpstrTitle = L"Select image";
         ofn.Flags = OFN_CREATEPROMPT | OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_EXPLORER | OFN_ALLOWMULTISELECT;
 
-        vector<string> files;
+        vector<wstring> files;
         if (GetOpenFileNameW(&ofn))
         {
             wchar_t* strptr = filename;
@@ -48,25 +48,25 @@ namespace mct
             {
                 fs::path fileName(strptr);
                 fileName = filePath / fileName;
-                files.push_back(fileName.string());
+                files.push_back(fileName.wstring());
                 strptr += wcslen(strptr) + 1;
             }
 
             if (files.size() < 1)
             {
                 files.clear();
-                files.push_back(filePath.string());
+                files.push_back(filePath.wstring());
             }
         }
         
         return files;
     }
 
-    map<string, Mat> loadImages(const vector<string>& filenames)
+    map<wstring, Mat> loadImages(const vector<wstring>& filenames)
     {
-        map<string, Mat> images;
+        map<wstring, Mat> images;
 
-        for (string s : filenames)
+        for (wstring s : filenames)
         {
             fs::path p(s);
             if (fs::is_directory(fs::status(p)))
@@ -78,10 +78,15 @@ namespace mct
                         || e.extension() == ".png"
                         || e.extension() == ".jpeg")
                     {
-                        Mat img = imread(e.string()); // Read the file
+                        size_t size = fs::file_size(e.wstring());
+                        vector<uchar> buffer(size);
+                        ifstream ifs(e.wstring(), ios::in | ios::binary);
+                        ifs.read(reinterpret_cast<char*>(&buffer[0]), size);
+                        Mat img = imdecode(buffer, 1);
+                        //Mat img = imread(e.wstring()); // Read the file
                         if (img.data != NULL)
                         {
-                            images[e.string()] = img;
+                            images[e.wstring()] = img;
                             cout << "Loaded image: " << e.filename() << endl;
                         }
                     }
@@ -89,10 +94,15 @@ namespace mct
             }
             else if (fs::is_regular_file(fs::status(p)))
             {
-                Mat img = imread(p.string()); // Read the file
+                size_t size = fs::file_size(p.wstring());
+                vector<uchar> buffer(size);
+                ifstream ifs(p.wstring(), ios::in | ios::binary);
+                ifs.read(reinterpret_cast<char*>(&buffer[0]), size);
+                Mat img = imdecode(buffer, 1);
+                //Mat img = imread(p.wstring()); // Read the file
                 if (img.data != NULL)
                 {
-                    images[p.string()] = img;
+                    images[p.wstring()] = img;
                     cout << "Loaded image: " << p.filename() << endl;
                 }
             }
@@ -191,7 +201,7 @@ namespace mct
         }
     }
 
-    int writePSD(Mat& img_original, Mat& img_mask, string filename)
+    int writePSD(const Mat& img_original, const Mat& img_mask, wstring filename)
     {
         PSD_USING_NAMESPACE;
 

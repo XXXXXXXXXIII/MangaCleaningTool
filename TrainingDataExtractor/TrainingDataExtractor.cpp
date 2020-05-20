@@ -15,7 +15,7 @@ using namespace cv;
 
 int main(int argc, char** argv)
 {
-	map<string, Mat> images = loadImages(selectImageFromDialog());
+	map<wstring, Mat> images = loadImages(selectImageFromDialog());
 	Ptr<MSERTextDetector> mser = new MSERTextDetector(); // Need filtering
 	Ptr<BoostFrameClassifier> frame_boost = new BoostFrameClassifier();
 
@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 			vector<Frame> frames = extractFrame(img_gray);
 			frame_boost->classifyFrame(frames);
 			cleanFrame(img_gray, frames);
-			vector<Bubble> bubbles = findBubble(img_gray);
+			vector<Bubble> bubbles = findBubbleCandidate(img_gray);
 			mser->detectBubbleTextLine(img_gray, bubbles);
 			manualBubbleSorter(img_gray, bubbles);
 			saveBubbleProperty(bubbles);
