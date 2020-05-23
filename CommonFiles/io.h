@@ -6,6 +6,8 @@
 #include <mct.h>
 
 #include <opencv2/core.hpp>
+//#include "psd_sdk/PsdExportDocument.h"
+
 #include <map>
 
 namespace mct
@@ -15,7 +17,8 @@ namespace mct
 
     std::vector<std::wstring> selectImageFromDialog(void);
     std::map<std::wstring, cv::Mat> loadImages(const std::vector<std::wstring>& filenames);
-    int writePSD(const cv::Mat& img_original, const cv::Mat& img_mask, std::wstring filename);
+    void saveImage(const cv::Mat& image, std::wstring filename);
+    //int writePSD(const cv::Mat& img_original, const cv::Mat& img_mask, std::wstring filename);
 
     void saveFrameProperty(std::vector<Frame>& frames);
     void saveBubbleProperty(std::vector<Bubble>& bubbles);

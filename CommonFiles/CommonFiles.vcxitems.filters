@@ -36,9 +36,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)bubble_boost_yaml.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)text.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\Psd.h">
       <Filter>psd_sdk</Filter>
     </ClInclude>
@@ -222,6 +219,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdVectorMask.h">
       <Filter>psd_sdk</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)mct.cpp">
@@ -235,9 +238,6 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)bubble.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)text.cpp">
-      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)EASTTextDetector.cpp">
       <Filter>Source Files</Filter>
@@ -309,6 +309,12 @@
       <Filter>psd_sdk</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)MSERBubbleDetector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)text.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

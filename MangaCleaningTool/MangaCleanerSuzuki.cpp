@@ -3,6 +3,7 @@
 #include "frame.h"
 #include "text.h"
 #include "io.h"
+#include "psd.h"
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
@@ -10,6 +11,10 @@
 #include <opencv2/ml.hpp>
 #include <opencv2/features2d.hpp>
 #include <tesseract/baseapi.h>
+
+#include "psd_sdk/Psd.h"
+#include "psd_sdk/PsdPlatform.h"
+#include "psd_sdk/PsdExport.h"
 
 #include <iostream>
 #include <map>
@@ -33,12 +38,17 @@ int main()
     //tess.SetVariable("save_best_choices", "T");
     for (auto& img : images)
     {
-        Mat img_gray = toGrayScale(img.second);        
+        Mat img_gray = toGrayScale(img.second);      
+
+        printf("Width: %d   Height: %d   \n", img.second.cols, img.second.rows);
+
+        cleanImage(img_gray);
 
         auto timer = startTimer();
         vector<Frame> frames = extractFrame(img_gray);
         frame_boost->classifyFrame(frames);
-        //cleanFrame(img_gray, frames);
+        straightenImage(img_gray, frames);
+        //cleanFrame(img_gray, frames); //TODO: Not very working
         cout << "Frame: " << stopTimer(timer) << endl;
 
         timer = startTimer();
@@ -68,7 +78,14 @@ int main()
         bitwise_or(ch_mask[0], ch_mask[1], ch_mask[1]);
         merge(ch_mask, img_mask);
 
-        writePSD(toGrayScale(img.second), img_mask, img.first);
+        saveImage(img_gray, img.first);
+
+        //psd::ExportDocument* psd_doc = createPsdDocument(img.second.size(), CV_8UC3);
+        //addPsdLayer(psd_doc, img.second, "Original");
+        //addPsdLayer(psd_doc, img_gray, "Level");
+        //addPsdLayer(psd_doc, img_mask, "Mask");
+        //savePsdDocument(psd_doc, img.first);
+        //writePSD(toGrayScale(img.second), img_mask, img.first);
     }
 
     cv::waitKey(0);

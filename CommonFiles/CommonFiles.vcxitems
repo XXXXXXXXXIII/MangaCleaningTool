@@ -22,6 +22,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)mct.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MSERBubbleDetector.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MSERTextDetector.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)psd.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdAllocator.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdBlendMode.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdColorMode.cpp" />
@@ -52,6 +53,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)frame_boost_yaml.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)io.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)mct.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)psd.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\Psd.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdAllocator.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)psd_sdk\PsdAlphaChannel.h" />
