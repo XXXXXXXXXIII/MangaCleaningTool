@@ -13,6 +13,11 @@
 
 namespace mct
 {
+    cv::Mat cropImage(cv::Mat& image);
+    void straightenImage(cv::Mat& image, std::vector<Frame>& frames);
+    void cleanImage(cv::Mat& image);
+    void denoiseImage(cv::Mat& image);
+
     void showImage(const cv::Mat& image, std::string name = "image", float size = 0.7);
     void showImageWithMouse(const cv::Mat& image, float size = 0.7);
 
@@ -32,6 +37,7 @@ namespace mct
     int compareRect(cv::Rect r1, cv::Rect r2);
     int compareContour(std::vector<cv::Point>& c1, std::vector<cv::Point>& c2);
     int minEdgeDist(cv::Rect r, cv::Point p);
+    double lineAngle(cv::Point a, cv::Point b);
 
     std::chrono::steady_clock::time_point startTimer(void);
     double stopTimer(std::chrono::steady_clock::time_point startTime);

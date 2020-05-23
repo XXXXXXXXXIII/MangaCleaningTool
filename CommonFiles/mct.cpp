@@ -1,10 +1,13 @@
 #include "mct.h"
 
+#define NOMINMAX
 #include <Windows.h>
 
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/photo.hpp>
+#include <opencv2/ximgproc.hpp>
 
 #include <chrono>
 
@@ -13,10 +16,152 @@ using namespace std;
 
 namespace mct
 {
+    /*
+        Straighten image based on extracted frames
+        Destroys frame after straightening
+    */
+    void straightenImage(Mat& image, vector<Frame>& frames)
+    {
+        vector<Point> full_contour;
+        Rect box;
+        for (auto& f : frames)
+        {
+            if (f.is_frame)
+                full_contour.insert(full_contour.end(), f.contour.begin(), f.contour.end());
+        }
+        //showImage(image);
+        RotatedRect rbox = minAreaRect(full_contour);
+        
+        double rotate_angle = rbox.angle;
+        while (rotate_angle < -45. || rotate_angle > 45.) rotate_angle -= (rotate_angle / abs(rotate_angle)) * 90;
+        //cout << rbox.angle << "   " << rotate_angle << endl;
+        printf("Straighten: %f degrees\n", rotate_angle);
+        //Point2f rect_points[4];
+        //rbox.points(rect_points);
+        //for (int j = 0; j < 4; j++)
+        //{
+        //    line(image, rect_points[j], rect_points[(j + 1) % 4], Scalar(180), 3);
+        //}
+        Mat M = getRotationMatrix2D(Point2f(image.cols / 2, image.rows / 2), rotate_angle, 1);
+        warpAffine(image, image, M, Size(image.cols, image.rows), 1, BORDER_REPLICATE);
+        frames.clear();
+        //showImage(image);
+    }
+
+    /*
+        Clean + level manga page
+    */
+    void cleanImage(cv::Mat& image)
+    {
+        CV_Assert(image.type() == CV_8UC1);
+        CV_Assert(!image.empty());
+
+        Mat img_large, img_tmp;
+        resize(image, img_large, Size((2000.0 / image.rows) * image.cols, 2000), 0, 0, INTER_LINEAR_EXACT);
+        bilateralFilter(img_large, img_tmp, -1, 10, 25);
+        resize(img_tmp, image, image.size(), 0, 0, INTER_LINEAR_EXACT);
+
+        int low = 0, high = UCHAR_MAX;
+
+        int histSize = 256;
+        float range[] = { 0, 256 }; //the upper boundary is exclusive
+        const float* histRange = { range };
+        Mat b_hist;
+        calcHist(&image, 1, 0, Mat(), b_hist, 1, &histSize, &histRange, true, false);
+
+        // Find local maxima
+        vector<int> local_max;
+        int n = 10;
+        float avg = 0;
+        for (int i = 0; i < histSize; i++)
+        {
+            bool is_max = true;
+            for (int m = i; m > 0 && m > i - n; --m)
+            {
+                if (b_hist.at<float>(m) > b_hist.at<float>(i))
+                {
+                    is_max = false;
+                    break;
+                }
+            }
+
+            for (int m = i; m < histSize && m < i + n; ++m)
+            {
+                if (b_hist.at<float>(m) > b_hist.at<float>(i))
+                {
+                    is_max = false;
+                    break;
+                }
+            }
+
+                //cout << i << "::" << b_hist.at<float>(i) << "       ";
+            if (is_max)
+            {
+                local_max.push_back(i);
+            }
+            else
+            {
+                avg += b_hist.at<float>(i);
+            }
+            //line(histImage, Point(bin_w * (i - 1), hist_h - cvRound(b_hist.at<float>(i - 1))),
+            //    Point(bin_w * (i), hist_h - cvRound(b_hist.at<float>(i))),
+            //    Scalar(255, 0, 0), 2, 8, 0);
+        }
+        avg /= histSize;
+
+         //Select local maxima //TODO: Select better values?
+        for (int& i : local_max)
+        {
+            if (i < 75)
+            {
+                if (b_hist.at<float>(i) > b_hist.at<float>(low))
+                {
+                    low = i;
+                }
+            }
+            else if (i > 200)
+            {
+                if (b_hist.at<float>(i) > b_hist.at<float>(high))
+                {
+                    high = i;
+                }
+            }
+        }
+
+        // Shift, too aggresive?
+        //for (; low < low + 50; low++)
+        //{
+        //    //cout << b_hist.at<float>(low) << endl;
+        //    if (b_hist.at<float>(low) < avg) break;
+        //}
+
+        //for (; high > high - 50; high--)
+        //{
+        //    //cout << b_hist.at<float>(high) << endl;
+        //    if (b_hist.at<float>(high) < avg) break;
+        //}
+        
+        // Level
+        uchar* img_data = image.data;
+        while (img_data < image.dataend)
+        {
+            double val = ((double)(*img_data) - low) / (high - low) * 255.;
+            if (val < 0) val = 0;
+            if (val > 255) val = 255;
+            *img_data = (uchar)val;
+            img_data++;
+        }
+        //imwrite("out.jpg", image);
+        printf("Leveling image: Low: %d  High: %d\n", low, high);
+        //showImage(image);
+
+        //fastNlMeansDenoising(image, image);
+    }
+
     void showImage(const Mat& image, string name, float size)
     {
         Mat img_out = image.clone();
-        resize(image, img_out, Size(), size, size, INTER_LINEAR_EXACT);
+        resize(image, img_out, Size(), size, size, INTER_LINEAR);
         imshow(name, img_out);
         waitKey(0);
         destroyAllWindows();
@@ -157,6 +302,11 @@ namespace mct
     int minEdgeDist(Rect r, Point p)
     {
         return min(r.width / 2 - abs((r.x + r.width / 2) - p.x), r.height / 2 - abs((r.y + r.height / 2) - p.y));
+    }
+
+    double lineAngle(cv::Point a, cv::Point b)
+    {
+        return atan2(a.y - b.y, a.x - b.x) * 180 / CV_PI;
     }
 
     // Checks background (border) color of image
