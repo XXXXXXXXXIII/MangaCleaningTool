@@ -13,6 +13,7 @@
 #include <opencv2/objdetect.hpp>
 #include <opencv2/ml.hpp>
 #include <opencv2/features2d.hpp>
+#include <opencv2/dnn.hpp>
 
 namespace mct
 {
@@ -51,6 +52,17 @@ namespace mct
         BoostBubbleClassifier(std::string str_model = bubble_boost_model);
         void classifyBubble(Bubble& bubble);
         void classifyBubble(std::vector<Bubble>& bubbles);
+    };
+
+    class TFBubbleClassifier
+    {
+    private:
+        cv::dnn::Net model;
+
+    public:
+        TFBubbleClassifier(std::string path = "C:\\Users\\timxi\\source\\repos\\MangaCleaningTool\\CommonFiles\\bubble.pb");
+        void classifyBubble(const cv::Mat& img, Bubble& bubble);
+        void classifyBubble(const cv::Mat& img, std::vector<Bubble>& bubbles);
     };
 
     //class CascadeBubbleDetector
