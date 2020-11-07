@@ -193,7 +193,129 @@ namespace mct
         return result;
     }
 
-    //TODO: Only works with clean, white text bubble
+    /*
+        TODO: Ensure every returned char is alone
+        1. remove overlap
+        2. sort ascending
+        3. for each component, merge in short directions
+        4. if similar to max size, break (max size = max length^2)
+    */
+    std::vector<Text> MSERTextDetector::detectTextChar(const cv::Mat& image)
+    {
+        CV_Assert(!image.empty());
+        CV_Assert(image.type() == CV_8UC1);
+
+        double min_val, max_val;
+        minMaxLoc(image, &min_val, &max_val);
+        if (min_val > 100 || max_val < 155) return vector<Text>();
+        
+        Mat img_bin = image.clone();
+        threshold(img_bin, img_bin, -1, 255, THRESH_OTSU);
+
+        vector<Text> text, final_text;
+        vector<vector<Point>> point;
+        vector<Rect> box;
+        mser->detectRegions(img_bin, point, box);
+
+        Mat img_swt = strokeWidthTransform(image);
+
+        //vector<float> score(box.size());
+        for (int i = 0; i < box.size(); i++)
+        {
+            if (box[i].area() > image.size().area() / 2) continue;
+            Text t = { box[i], 0, 0 };
+            for (int r = box[i].y; r < box[i].y + box[i].height; r++)
+            {
+                for (int c = box[i].x; c < box[i].x + box[i].width; c++)
+                {
+                    if (img_swt.at<float>(r, c) > 0)
+                    {
+                        t.fill_area++;
+                        t.avg_width += img_swt.at<float>(r, c);
+                    }
+                }
+            }
+            t.avg_width /= t.fill_area;
+            text.push_back(t);
+            //score[i] = area[i] / box[i].area();
+        }
+
+        sort(text.begin(), text.end(), [](const Text& lhs, const Text& rhs)
+            {
+                return lhs.box.area() > rhs.box.area();
+            });
+
+        double avg_sqr = 0;
+        vector<bool> keep(text.size(), true);
+        for (int i = 0; i < text.size(); i++)
+        {
+            if (!keep[i]) continue;
+            if (text[i].box.size().aspectRatio() < 0.9
+                || text[i].box.size().aspectRatio() > 1.1)
+            {
+                for (int j = i + 1; j < text.size(); j++)
+                {
+                    if (!keep[j]) continue;
+                    Rect n = text[j].box | text[i].box;
+                    if (std::max(n.width, n.height) <= 1.1 * avg_sqr)
+                    {
+                        text[i].box = n;
+                        text[i].avg_width = text[i].avg_width * text[i].fill_area + text[j].avg_width * text[j].fill_area;
+                        text[i].fill_area += text[j].fill_area;
+                        text[i].avg_width /= text[i].fill_area;
+                        keep[j] = false;
+
+                        cout << max(n.width, n.height) << endl;
+                    Mat temp = image.clone();
+                    rectangle(temp, n, Scalar(180), 2);
+                    rectangle(temp, text[i].box, Scalar(0), 1);
+                    rectangle(temp, text[j].box, Scalar(100), 1);
+                    showImage(temp, "", 1);
+                    }
+
+
+                    if (text[i].box.size().aspectRatio() < 0.9
+                        || text[i].box.size().aspectRatio() > 1.1)
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                double temp = (avg_sqr + max(text[i].box.width, text[i].box.height)) / 2;
+                if (temp > avg_sqr)
+                {
+                    avg_sqr = temp;
+                    cout << avg_sqr << endl;
+                }
+            }
+
+            //for (int j = i + 1; j < text.size(); j++)
+            //{
+            //    if (!keep[j]) continue;
+            //    if ((text[j].box & text[i].box) == text[j].box)
+            //    {
+            //        keep[j] = false;
+            //    }
+            //}
+        }
+
+        for (int i = 0; i < text.size(); i++)
+        {
+            if (keep[i])
+            {
+                final_text.push_back(text[i]);
+                //cout << text[i].box << endl;
+                //rectangle(image, text[i].box, Scalar(180), 2);
+            }
+        }
+        //showImage(image);
+
+        return final_text;
+    }
+
+    // Assumes clean, white text bubble
     void MSERTextDetector::detectBubbleTextLine(const Mat& image, vector<Bubble>& bubbles)
     {
         for (auto& b : bubbles)
@@ -204,11 +326,15 @@ namespace mct
 
             b.text = detectTextLine(bbl_clone);
 
-            /*for (auto& t : bubble_text)
+            //b.text = detectTextChar(bbl_clone);
+            for (auto& t : b.text)
             {
-                rectangle(bbl, t.box, Scalar(180), 3);
-            }*/
+                //rectangle(image, b.box, Scalar(0), 2);
+                //drawContours(image, vector<vector<Point>>{b.contour}, -1, Scalar(100), 1);
+                //rectangle(bbl, t.box, Scalar(180), 2);
+            }
+            //showImage(bbl_clone);
         }
-        //showImage(image, "", 0.6);
+        //showImage(image);
     }
 }

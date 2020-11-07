@@ -460,48 +460,48 @@ namespace mct
         return text;
 	}
 
-    void TesseractTextDetector::detextBubbleTextLine(const Mat& image, vector<Bubble>& bubbles)
-    {
-        namespace ts = tesseract;
+    //void TesseractTextDetector::detextBubbleTextLine(const Mat& image, vector<Bubble>& bubbles)
+    //{
+    //    namespace ts = tesseract;
 
-        Mat img_bin;
-        threshold(image, img_bin, -1, 255, THRESH_OTSU);
-        for (auto& b : bubbles)
-        {
-            Mat bbl(img_bin, b.box);
-            Mat bbl_clone = bbl.clone();
-            extractBubble(bbl_clone, { b }, 255, -b.box.tl());
+    //    Mat img_bin;
+    //    threshold(image, img_bin, -1, 255, THRESH_OTSU);
+    //    for (auto& b : bubbles)
+    //    {
+    //        Mat bbl(img_bin, b.box);
+    //        Mat bbl_clone = bbl.clone();
+    //        extractBubble(bbl_clone, { b }, 255, -b.box.tl());
 
-            tess.SetImage(bbl_clone.data, bbl_clone.cols, bbl_clone.rows, bbl_clone.elemSize1(), bbl_clone.step1());
-            if (b.box.width > b.box.height)
-            {
-                tess.SetPageSegMode(ts::PageSegMode::PSM_SINGLE_BLOCK);
-            }
-            else
-            {
-                tess.SetPageSegMode(ts::PageSegMode::PSM_SINGLE_BLOCK_VERT_TEXT);
-            }
-            tess.SetSourceResolution(600);
-            tess.Recognize(0);
-            ts::ResultIterator* iter = tess.GetIterator();
-            ts::PageIteratorLevel level = ts::RIL_TEXTLINE;
+    //        tess.SetImage(bbl_clone.data, bbl_clone.cols, bbl_clone.rows, bbl_clone.elemSize1(), bbl_clone.step1());
+    //        if (b.box.width > b.box.height)
+    //        {
+    //            tess.SetPageSegMode(ts::PageSegMode::PSM_SINGLE_BLOCK);
+    //        }
+    //        else
+    //        {
+    //            tess.SetPageSegMode(ts::PageSegMode::PSM_SINGLE_BLOCK_VERT_TEXT);
+    //        }
+    //        tess.SetSourceResolution(600);
+    //        tess.Recognize(0);
+    //        ts::ResultIterator* iter = tess.GetIterator();
+    //        ts::PageIteratorLevel level = ts::RIL_TEXTLINE;
 
-            if (iter != 0)
-            {
-                do
-                {
-                    //const char* word = iter->GetUTF8Text(level);
-                    //if (word == NULL) continue;
-                    float conf = iter->Confidence(level);
-                    int x1, y1, x2, y2;
-                    iter->BoundingBox(level, &x1, &y1, &x2, &y2);
-                    //printf("word: '%s';  \tconf: %.2f; BoundingBox: %d,%d,%d,%d;\n", word, conf, x1, y1, x2, y2);
-                    rectangle(bbl, Rect(x1, y1, x2 - x1, y2 - y1), Scalar((uchar)255 - (255. * conf / 100)), 3);
-                    //delete[] word;
-                } while (iter->Next(level));
-            }
-        }
-        showImage(img_bin);
-    }
+    //        if (iter != 0)
+    //        {
+    //            do
+    //            {
+    //                //const char* word = iter->GetUTF8Text(level);
+    //                //if (word == NULL) continue;
+    //                float conf = iter->Confidence(level);
+    //                int x1, y1, x2, y2;
+    //                iter->BoundingBox(level, &x1, &y1, &x2, &y2);
+    //                //printf("word: '%s';  \tconf: %.2f; BoundingBox: %d,%d,%d,%d;\n", word, conf, x1, y1, x2, y2);
+    //                rectangle(bbl, Rect(x1, y1, x2 - x1, y2 - y1), Scalar((uchar)255 - (255. * conf / 100)), 3);
+    //                //delete[] word;
+    //            } while (iter->Next(level));
+    //        }
+    //    }
+    //    showImage(img_bin);
+    //}
 
 }

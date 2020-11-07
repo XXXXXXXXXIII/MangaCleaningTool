@@ -8,7 +8,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/dnn.hpp>
 #include <opencv2/features2d.hpp>
-#include <tesseract/baseapi.h>
+//#include <tesseract/baseapi.h>
 
 namespace mct
 {
@@ -26,20 +26,20 @@ namespace mct
 	std::vector<cv::Rect> textCandidateFilter(const cv::Mat& img_ccl);
 	std::vector<Text> findTextCandidate(const cv::Mat& image);
 
-	class TesseractTextDetector
-	{
-	private:
-		tesseract::TessBaseAPI tess;
+	//class TesseractTextDetector
+	//{
+	//private:
+	//	tesseract::TessBaseAPI tess;
 
-	public:
-		TesseractTextDetector()
-		{
-			tess.Init("C:\\Users\\timxi\\source\\repos\\MangaCleaningTool\\MangaCleaningTool\\", "jpn+jpn_vert", tesseract::OEM_LSTM_ONLY);
-		}
+	//public:
+	//	TesseractTextDetector()
+	//	{
+	//		tess.Init("C:\\Users\\timxi\\source\\repos\\MangaCleaningTool\\MangaCleaningTool\\", "jpn+jpn_vert", tesseract::OEM_LSTM_ONLY);
+	//	}
 
-		void detextBubbleTextLine(const cv::Mat& image, std::vector<Bubble>& bubbles);
-		//void detextBubbleTextChar();
-	};
+	//	void detextBubbleTextLine(const cv::Mat& image, std::vector<Bubble>& bubbles);
+	//	//void detextBubbleTextChar();
+	//};
 
 	class MSERTextDetector
 	{
@@ -47,13 +47,13 @@ namespace mct
 		enum class ORIENTATION
 		{
 			VERTICAL,
-			HORIZONTAL,
-			COUNT
+			HORIZONTAL
 		};
 
 		cv::Ptr<cv::MSER> mser;
 		std::vector<Text> detectTextLine(const cv::Mat& image);
 		std::vector<Text> joinTextLine(std::vector<Text>& text, ORIENTATION o = ORIENTATION::VERTICAL);
+		std::vector<Text> detectTextChar(const cv::Mat& image);
 
 	public:
 		MSERTextDetector()

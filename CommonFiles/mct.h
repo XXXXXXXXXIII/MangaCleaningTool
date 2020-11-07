@@ -38,6 +38,8 @@ namespace mct
     int compareContour(std::vector<cv::Point>& c1, std::vector<cv::Point>& c2);
     int minEdgeDist(cv::Rect r, cv::Point p);
     double lineAngle(cv::Point a, cv::Point b);
+    cv::Point lineIntersect(cv::Point a1, cv::Point a2, cv::Point b1, cv::Point b2);
+    void mergeContour(std::vector<cv::Point>& dst, std::vector<cv::Point>& src);
 
     std::chrono::steady_clock::time_point startTimer(void);
     double stopTimer(std::chrono::steady_clock::time_point startTime);

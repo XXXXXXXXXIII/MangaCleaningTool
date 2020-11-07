@@ -13,18 +13,6 @@ using namespace cv::ml;
 
 namespace mct
 {
-    struct cmpRect2 {
-        bool operator() (const Rect& lhs, const Rect& rhs) const
-        {
-            return lhs.area() > rhs.area();
-        }
-    };
-
-    bool cmpRect(const pair<Rect, Point>& lhs, const pair<Rect, Point>& rhs)
-    {
-        return lhs.first.area() > rhs.first.area();
-    }
-
     /*
         Extract frame, returns list of pair of individual frame mask and its rect relative to img
         Derived from: https://ieeexplore.ieee.org/document/5501698
@@ -37,47 +25,164 @@ namespace mct
         const uchar FRAME_COLOR_L = 128, FRAME_COLOR_H = 129;
         const uchar CONTOUR_COLOR_L = 254, CONTOUR_COLOR_H = 255;
 
-
+        if (false)
         {
-            Mat img_edge;
-            Mat img_tmp = Mat::zeros(img.size(), CV_8UC1);
-            //blur(img, img_edge, Size(3, 3));
-            bilateralFilter(img, img_edge, 5, 200, 50); // Remove noise on image //TODO: Find better simga value
-            Canny(img_edge, img_edge, 128, 255);
-
-            vector<vector<Point>> ext_contour, hull_contour;
-            vector<Vec4i> hierarchy;
-            findContours(img_edge, ext_contour, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_NONE);
-            for (int i = 0; i < ext_contour.size(); ++i)
+            Ptr<BoostFrameClassifier> frame_boost = new BoostFrameClassifier();
+            Mat img_bin;
+            threshold(img, img_bin, -1, 255, THRESH_OTSU);
+            if (bgColor(img)[0] > 128)
             {
-                //if (contourArea(ext_contour[i]) < 10) continue;
-                //drawContours(img_tmp, ext_contour, -1, Scalar(180), FILLED, 8, hierarchy, 1);
-                Rect box = boundingRect(ext_contour[i]);
-                rectangle(img_tmp, box, Scalar(180), 2);
+                bitwise_not(img_bin, img_bin);
+            }
+            vector<vector<Point>> ext_contour, hull_contour;
+            findContours(img_bin, ext_contour, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+            drawContours(img_bin, ext_contour, -1, Scalar(CONTOUR_COLOR_H), FILLED);
+            vector<Frame> frames(ext_contour.size());
+            for (int i = 0; i < frames.size(); ++i)
+            {
+                frames[i].contour = ext_contour[i];
+                frames[i].box = boundingRect(ext_contour[i]);
+                frames[i].is_frame = true;
+                frames[i].page = img.size();
             }
 
-            //showImage(img_tmp);
+            sort(frames.begin(), frames.end(), [](const Frame& lhs, const Frame& rhs)
+                {
+                    return lhs.box.area() > rhs.box.area();
+                });
 
+            struct Line
+            {
+                Point start;
+                Point end;
+            };
 
-            //bilateralFilter(img, temp, 5, 50, 50);
-            ////showImage(temp);
-            //inRange(temp, Scalar(0), Scalar(25), temp);
+            vector<Line> lines;
+            for (auto& f : frames)
+            {
+                vector<Point> hull;
+                convexHull(f.contour, hull);
 
-            //Ptr<MSER> mser = MSER::create();
-            //vector<vector<Point>> pts;
-            //vector<Rect> box;
-            //mser->detectRegions(img, pts, box);
-            //for (auto& b : box)
+                int maxX = 0, maxY = 0, minX = img.cols, minY = img.rows;
+
+                for (auto& h : hull)
+                {
+                    if (h.x > maxX) maxX = h.x;
+                    if (h.x < minX) minX = h.x;
+                    if (h.y > maxY) maxY = h.y;
+                    if (h.y < minY) minY = h.y;
+                    //lines.push_back(Line{ Point(h.x, 0), Point(h.x, img_bin.rows) });
+                    //lines.push_back(Line{ Point(0, h.y), Point(img_bin.cols, h.y) });
+                }
+
+                lines.push_back(Line{ Point(minX - 1, 0), Point(minX - 1, img_bin.rows) });
+                lines.push_back(Line{ Point(maxX + 1, 0), Point(maxX + 1, img_bin.rows) });
+                lines.push_back(Line{ Point(0, minY - 1), Point(img_bin.cols, minY - 1) });
+                lines.push_back(Line{ Point(0, maxY + 1), Point(img_bin.cols, maxY + 1) });
+            }
+
+            vector<Line> segments;
+            for (auto& l : lines)
+            {
+                vector<Point> seg{ l.start, l.end };
+                for (auto& l2 : lines)
+                {
+                    Rect r(0, 0, img.cols, img.rows);
+                    Point x = lineIntersect(l.start, l.end, l2.start, l2.end);
+                    if (!r.contains(x) || l.start == l2.start) continue;
+
+                    seg.push_back(x);
+                    
+                    //circle(img_bin, x, 5, Scalar(180), 2);
+                }
+
+                sort(seg.begin(), seg.end(), [](const Point& lhs, const Point& rhs)
+                    {
+                        if (lhs.x == rhs.x) return lhs.y < rhs.y;
+                        else return lhs.x < rhs.x;
+                    });
+
+                for (int i = 1; i < seg.size(); i++)
+                {
+                    if (seg[i - 1] == seg[i]) continue;
+                    segments.push_back(Line{ seg[i - 1], seg[i] });
+                }
+                //line(img_bin, l.start, l.end, Scalar(180), 1);
+                //circle(img_bin, l.start, 2, Scalar(180));
+                //circle(img_bin, l.end, 2, Scalar(180));
+            }
+
+            for (auto& l : segments)
+            {
+                Point2f p = l.start;
+                Point2f dir = Point2f(l.end - l.start) / pointDist(l.end, l.start);
+                //cout << dir << endl;
+                for (int i = 0; i < ceil(pointDist(l.end, l.start)); i++)
+                {
+                    if (p.x < 0 || p.x >= img_bin.cols
+                        || p.y < 0 || p.y >= img_bin.rows) break;
+                    if (img_bin.at<uchar>(p) > 0)
+                    {
+                        l.start = Point(-1, -1);
+                        l.end = Point(-1, -1);
+                        break;
+                    }
+                    p += dir;
+                }
+            }
+
+            for (auto& l : segments)
+            {
+                line(img_bin, l.start, l.end, Scalar(120), 2);
+            }
+
+            //showImage(img);
+            //showImage(img_bin);
+            
+            //TODO: contour line tracer
+
+            //frame_boost->classifyFrame(frames);
+
+            //vector<Frame> result;
+            //frames.erase(remove_if(frames.begin(), frames.end(), 
+            //    [](const Frame& f) { return !f.is_frame; }), frames.end());
+
+            //img_bin = Mat::zeros(img.size(), CV_8UC1);
+            //for (auto& f : frames)
             //{
-            //    rectangle(temp, b, Scalar(180), 4);
+            //    bool intersect = false;
+            //    for (auto& f2 : frames)
+            //    {
+            //        if (f2.box != f.box && !(f2.box & f.box).empty())
+            //        {
+            //            if ((f2.box & f.box) == f.box) // Contained
+            //            {
+            //                intersect = true;
+            //                break;
+            //            }
+            //            else if ((f2.box & f.box) == f2.box) // Contains
+            //            {
+            //                continue;
+            //            }
+            //            else // Partial
+            //            {
+            //                intersect = true;
+            //                //TODO: COnnect the dots
+            //            }
+            //        }
+            //    }
+            //    if (!intersect)
+            //    {
+            //        drawContours(img_bin, vector<vector<Point>>{ f.contour }, -1, Scalar(CONTOUR_COLOR_L), FILLED);
+            //        result.push_back(f);
+            //    }
             //}
-            //showImage(temp);
+                //showImage(img_bin);
         }
 
         Mat img_bin;
         Mat img_tmp;
-        bilateralFilter(img, img_bin, 5, 50, 50); // Remove noise on image //TODO: Find better simga value
-        threshold(img_bin, img_bin, -1, 255, THRESH_OTSU); // Good for noisy image, however removes details on gradients
+        threshold(img, img_bin, -1, 255, THRESH_OTSU); // Good for noisy image, however removes details on gradients
         bitwise_not(img_bin, img_bin);
         //threshold(img, img_bin, 240, 255, THRESH_BINARY); // Good for clean image; will cause frames to merge on dirty images
         //frame_mask = Mat(img_bin.size(), CV_8UC1, Scalar(255));
@@ -93,7 +198,10 @@ namespace mct
             Rect box = boundingRect(c);
             ext_box.push_back(pair<Rect, Point>(box, c[0])); //TODO: Find better seed points
         }
-        sort(ext_box.begin(), ext_box.end(), cmpRect);
+        sort(ext_box.begin(), ext_box.end(), [](const pair<Rect, Point>& lhs, const pair<Rect, Point>& rhs)
+            {
+                return lhs.first.area() > rhs.first.area();
+            });
 
         // connect small components
         for (int e = 0; e < ext_box.size(); e++)

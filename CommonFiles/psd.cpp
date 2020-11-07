@@ -46,7 +46,7 @@ namespace mct
 	{
 		PSD_USING_NAMESPACE;
 		CV_Assert(image.cols == doc->width && image.rows == doc->height);
-		CV_Assert(!(doc->colorMode == exportColorMode::GRAYSCALE && image.channels() > 2));
+		//CV_Assert(!(doc->colorMode == exportColorMode::GRAYSCALE && image.channels() > 2));
 		
 		MallocAllocator allocator;
 		const unsigned int new_layer = AddLayer(doc, &allocator, name.c_str());

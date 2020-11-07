@@ -25,7 +25,7 @@ namespace mct
 {
     vector<wstring> selectImageFromDialog(void)
     {
-        wchar_t filename[2560] = {'\0'};
+        wchar_t filename[25600] = {'\0'};
 
         OPENFILENAME ofn;
         ZeroMemory(&ofn, sizeof(ofn));
@@ -33,7 +33,7 @@ namespace mct
         ofn.hwndOwner = NULL;  // If you have a window to center over, put its HANDLE here
         ofn.lpstrFilter = L"Image File\0*.png; *.jpg; *.jpeg\0";
         ofn.lpstrFile = filename;
-        ofn.nMaxFile = 2560;
+        ofn.nMaxFile = 25600;
         ofn.lpstrTitle = L"Select image";
         ofn.Flags = OFN_CREATEPROMPT | OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_EXPLORER | OFN_ALLOWMULTISELECT;
 

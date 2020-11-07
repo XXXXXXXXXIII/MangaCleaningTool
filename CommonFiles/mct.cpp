@@ -10,6 +10,7 @@
 #include <opencv2/ximgproc.hpp>
 
 #include <chrono>
+#include <numeric>
 
 using namespace cv;
 using namespace std;
@@ -56,72 +57,98 @@ namespace mct
         CV_Assert(image.type() == CV_8UC1);
         CV_Assert(!image.empty());
 
-        Mat img_large, img_tmp;
-        resize(image, img_large, Size((2000.0 / image.rows) * image.cols, 2000), 0, 0, INTER_LINEAR_EXACT);
-        bilateralFilter(img_large, img_tmp, -1, 10, 25);
-        resize(img_tmp, image, image.size(), 0, 0, INTER_LINEAR_EXACT);
+        //Mat img_large, img_tmp;
+        //resize(image, img_large, Size((2000.0 / image.rows) * image.cols, 2000), 0, 0, INTER_CUBIC);
+        //bilateralFilter(img_large, img_tmp, -1, 10, 15);
+        ////medianBlur(img_tmp, img_tmp, 3);
+        //fastNlMeansDenoising(img_tmp, img_tmp);
+        //img_large = img_tmp.clone();
+        //GaussianBlur(img_tmp, img_tmp, cv::Size(0, 0), 3);
+        //addWeighted(img_large, 1.5, img_tmp, -0.5, 0, img_tmp);
+        ////showImage(img_tmp);
+        //resize(img_tmp, image, image.size(), 0, 0, INTER_LINEAR_EXACT);
 
-        int low = 0, high = UCHAR_MAX;
+        // Screw this
+        //int histSize = 256;
+        //float range[] = { 0, 256 }; //the upper boundary is exclusive
+        //const float* histRange = { range };
+        //Mat b_hist;
+        //calcHist(&image, 1, 0, Mat(), b_hist, 1, &histSize, &histRange, true, false);
 
-        int histSize = 256;
-        float range[] = { 0, 256 }; //the upper boundary is exclusive
-        const float* histRange = { range };
-        Mat b_hist;
-        calcHist(&image, 1, 0, Mat(), b_hist, 1, &histSize, &histRange, true, false);
+        vector<double> hist(256, 0);
+        uchar* ptr = image.data;
+        while (ptr < image.dataend)
+        {
+            hist[*ptr]++;
+            ++ptr;
+        }
 
-        // Find local maxima
         vector<int> local_max;
         int n = 10;
+        vector<double> temp(hist);
+        for (int i = 0; i < hist.size(); ++i)
+        {
+            hist[i] = std::accumulate(hist.begin() + max(i - n, 0),
+                    hist.begin() + min(i + n, (int)hist.size()), 0.0) / (min(i + n, 256) - max(i - n, 0));
+        }
+
+        // Find local maxima
         float avg = 0;
-        for (int i = 0; i < histSize; i++)
+        for (int i = 0; i < hist.size(); i++) // Ignore 0 and 255
         {
             bool is_max = true;
-            for (int m = i; m > 0 && m > i - n; --m)
+            for (int m = i; m >= 0 && m > i - n; --m)
             {
-                if (b_hist.at<float>(m) > b_hist.at<float>(i))
+                if (hist[m] > hist[i])
                 {
                     is_max = false;
                     break;
                 }
             }
 
-            for (int m = i; m < histSize && m < i + n; ++m)
+            for (int m = i; m < hist.size() && m < i + n; ++m)
             {
-                if (b_hist.at<float>(m) > b_hist.at<float>(i))
+                if (hist[m] > hist[i])
                 {
                     is_max = false;
                     break;
                 }
             }
 
-                //cout << i << "::" << b_hist.at<float>(i) << "       ";
+            //cout << i << "::" << hist[i] << "       ";
             if (is_max)
             {
                 local_max.push_back(i);
             }
             else
             {
-                avg += b_hist.at<float>(i);
-            }
-            //line(histImage, Point(bin_w * (i - 1), hist_h - cvRound(b_hist.at<float>(i - 1))),
-            //    Point(bin_w * (i), hist_h - cvRound(b_hist.at<float>(i))),
-            //    Scalar(255, 0, 0), 2, 8, 0);
+                avg += hist[i];
+            }            
         }
-        avg /= histSize;
+        avg /= hist.size();
 
+        int low = 0, high = 255;
          //Select local maxima //TODO: Select better values?
         for (int& i : local_max)
         {
-            if (i < 75)
+            //double temp = std::accumulate(hist.begin() + max(i - n, 0),
+            //    hist.end() + min(i + n, 256), 0.0) / (min(i + n, 256) - max(i - n, 0));
+            //cout << i << "  " << temp << "   " << low_sum << "   " << high_sum << endl;
+            //cout << std::accumulate(hist.begin() + max(i - n, 0),
+            //    hist.end() + min(i + n, 256), 0.0) << endl;
+            //cout << min(i + n, 256) << "   " << max(i - n, 0) << endl;
+            if (i < 100)
             {
-                if (b_hist.at<float>(i) > b_hist.at<float>(low))
+                if (hist[i] > hist[low]
+                    || (low == 0 && hist[i] > hist[low] * 0.8))
                 {
                     low = i;
                 }
             }
-            else if (i > 200)
+            else if (i > 156)
             {
-                if (b_hist.at<float>(i) > b_hist.at<float>(high))
+                if (hist[i] > hist[high]
+                    || (high == 255 && hist[i] > hist[high] * 0.8))
                 {
                     high = i;
                 }
@@ -129,17 +156,19 @@ namespace mct
         }
 
         // Shift, too aggresive?
-        //for (; low < low + 50; low++)
-        //{
-        //    //cout << b_hist.at<float>(low) << endl;
-        //    if (b_hist.at<float>(low) < avg) break;
-        //}
+        float hi_peak = hist[high];
+        float lo_peak = hist[low];
+        for (; low < low + 30; low++)
+        {
+            //cout << b_hist.at<float>(low) << endl;
+            if (hist[low + 1] < avg || hist[low + 1] < lo_peak / 2.) break;
+        }
 
-        //for (; high > high - 50; high--)
-        //{
-        //    //cout << b_hist.at<float>(high) << endl;
-        //    if (b_hist.at<float>(high) < avg) break;
-        //}
+        for (; high > high - 30; high--)
+        {
+            //cout << b_hist.at<float>(high) << endl;
+            if (hist[high - 1] < avg || hist[high - 1] < hi_peak / 2.) break;
+        }
         
         // Level
         uchar* img_data = image.data;
@@ -151,11 +180,20 @@ namespace mct
             *img_data = (uchar)val;
             img_data++;
         }
+
+
+        //Mat img_hist = Mat::zeros(Size(hist.size() * 2, 200), CV_8UC3);
+        //for (int i = 0; i < hist.size(); i++)
+        //{
+        //    line(img_hist, Point(i * 2, 0),
+        //        Point(i * 2, hist[i] / *std::max_element(hist.begin(), hist.end()) * 200),
+        //        Scalar(255, 255, 0), 1, 8, 0);
+        //}
+        //showImage(img_hist, "", 1);
+
         //imwrite("out.jpg", image);
         printf("Leveling image: Low: %d  High: %d\n", low, high);
         //showImage(image);
-
-        //fastNlMeansDenoising(image, image);
     }
 
     void showImage(const Mat& image, string name, float size)
@@ -309,6 +347,44 @@ namespace mct
         return atan2(a.y - b.y, a.x - b.x) * 180 / CV_PI;
     }
 
+    cv::Point lineIntersect(cv::Point o1, cv::Point p1, cv::Point o2, cv::Point p2)
+    {
+        Point2f x = o2 - o1;
+        Point2f d1 = p1 - o1;
+        Point2f d2 = p2 - o2;
+
+        float cross = d1.x * d2.y - d1.y * d2.x;
+        if (abs(cross) < /*EPS*/1e-8)
+            return Point(-1, -1);
+
+        double t1 = (x.x * d2.y - x.y * d2.x) / cross;
+        Point2f r = Point2f(o1) + d1 * t1;
+        return Point(r);
+    }
+
+    void mergeContour(std::vector<cv::Point>& dst, std::vector<cv::Point>& src)
+    {
+        int min_src_idx = 0;
+        int min_dst_idx = 0;
+        int min_dist = INT_MAX;
+        for (int i = 0; i < src.size(); ++i)
+        {
+            int new_dist = INT_MAX;
+            for (int j = 0; j < dst.size(); ++j)
+            {
+                if ((new_dist = pointDist(dst[j], src[i])) < min_dist)
+                {
+                    min_dist = new_dist;
+                    min_src_idx = i;
+                    min_dst_idx = j;
+                }
+            }
+        }
+
+        rotate(src.begin(), src.begin() + min_src_idx, src.end());
+        dst.insert(dst.begin() + min_dst_idx, src.begin(), src.end());
+    }
+
     // Checks background (border) color of image
     Scalar bgColor(const Mat& img, int borderWidth)
     {
@@ -320,6 +396,7 @@ namespace mct
 
     int tagImage(const Mat& display_image)
     {
+        imshow("Sorter", Mat::zeros(1, 1, CV_8U));
         while (true)
         {
             imshow("Sorter", display_image);

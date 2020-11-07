@@ -44,6 +44,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdSyncFileReader.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)psd_sdk\PsdSyncFileWriter.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)text.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)TFBubbleClassifier.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)bubble.h" />

@@ -109,7 +109,10 @@ int main(int argc, char** args)
         vector<Mat> ch_mask;
         split(img_mask, ch_mask);
         ch_mask[0] = createBubbleMask(img.second.size(), bubbles, 0, 255);
-        //bitwise_or(createBubbleMask(img.second.size(), bubbles, 0, 255), createFrameMask(img.second.size(), frames, 255, 0), ch_mask[0]);
+        if (doFrame)
+        {
+            bitwise_or(createBubbleMask(img.second.size(), bubbles, 0, 255), createFrameMask(img.second.size(), frames, 255, 0), ch_mask[0]);
+        }
         bitwise_or(ch_mask[0], ch_mask[1], ch_mask[1]);
         merge(ch_mask, img_mask);
 

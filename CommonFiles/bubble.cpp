@@ -86,21 +86,20 @@ namespace mct
         Find connected components for the image. 
         Sweep through several erosion level to close any openings.
         //TODO: Support non-white bubble
-        //TODO: Remove overlapping bubbles
     */
 	vector<Bubble> findBubbleCandidate(const Mat& image)
 	{
         vector<Bubble> bubbles;
-        for (int s = 1; s <= 9; s += 2) //HACK: sweep through different erosion level to close bubble openings
+        for (int s = 1; s <= 9; s += 2) //sweep through different erosion level to close bubble openings
         {
             Mat img_bin, img_ccl;
             const uchar bubbleColor = 180, bubbleColorH = 181;
-            bilateralFilter(image, img_bin, 5, 50, 50); // Remove noise on image //TODO: Find better simga value
-            threshold(img_bin, img_bin, 240, 255, THRESH_BINARY); // threshold 240 as recommended in the paper
+            //bilateralFilter(image, img_bin, 5, 50, 50); // Remove noise on image
+            threshold(image, img_bin, 240, 255, THRESH_BINARY); // threshold 240 as recommended in the paper
 
             // CCL Filter
             Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(s, s));
-            morphologyEx(img_bin, img_bin, MORPH_ERODE, kernel, Point(-1, -1), 1);
+            morphologyEx(img_bin, img_bin, MORPH_OPEN, kernel, Point(-1, -1), 1);
             int nLabels = connectedComponents(img_bin, img_ccl, 4);
             vector<Rect> blobs(nLabels);
             vector<int> areas(nLabels);
@@ -173,7 +172,37 @@ namespace mct
                     //drawContours(bubble_mask, contours, i, Scalar(128), FILLED);
                 }
             }
+            //showImage(img_bin);
         }
+
+        // Remove duplicates
+        sort(bubbles.begin(), bubbles.end(), [](const Bubble& lhs, const Bubble& rhs)
+            {
+                return lhs.box.area() > rhs.box.area();
+            });
+
+        Mat img_bin = Mat::zeros(image.size(), CV_8UC1);
+        for (int i = 0; i < bubbles.size(); ++i)
+        {
+            if (!bubbles[i].is_bubble) continue;
+            for (int j = i + 1; j < bubbles.size(); ++j)
+            {
+                if (0.9 * bubbles[i].box.area() > bubbles[j].box.area()) break;
+                if (!bubbles[j].is_bubble) continue;
+                if ((bubbles[i].box & bubbles[j].box) == bubbles[j].box
+                    && contourArea(bubbles[i].contour) > contourArea(bubbles[j].contour))
+                {
+                    bubbles[j].is_bubble = false;
+                }
+            }
+
+            //rectangle(img_bin, bubbles[i].box, Scalar(180), 1);
+        }
+        bubbles.erase(remove_if(bubbles.begin(), bubbles.end(),
+                [](const Bubble& b) { return !b.is_bubble; }), bubbles.end());
+
+        //showImage(image);
+        //showImage(img_bin);
 
         return bubbles;
 	}

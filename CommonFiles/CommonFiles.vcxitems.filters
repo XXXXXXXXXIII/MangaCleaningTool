@@ -317,6 +317,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)psd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)TFBubbleClassifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)frozen_east_text_detection.pb">
