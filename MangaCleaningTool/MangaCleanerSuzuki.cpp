@@ -84,17 +84,20 @@ int main(int argc, char** args)
 
         timer = startTimer();
         vector<Bubble> bubbles = findBubbleCandidate(img_gray);
-        //bubble_mser->detectBubble(img_gray);
         cout << "Bubble: " << stopTimer(timer) << endl;
         
         timer = startTimer();
-        //tess->detextBubbleTextLine(img_gray, bubbles);
-        //east->detectBubbleText(img.second, bubbles);        
         text_mser->detectBubbleTextLine(img_gray, bubbles);
         cout << "Text: " << stopTimer(timer) << endl;
 
+        //Mat img_tmp = img_gray.clone();
+        //for (auto& b : bubbles)
+        //{
+        //    rectangle(img_tmp, b.box, Scalar(0));
+        //}
+        //showImage(img_tmp);
+
         timer = startTimer();
-        //bubble_tf->classifyBubble(img_gray, bubbles);
         bubble_boost->classifyBubble(bubbles);
         cout << "Bubble Classifier: " << stopTimer(timer) << endl;
 

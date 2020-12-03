@@ -151,7 +151,6 @@ namespace mct
                 {
                     Rect fillBox;
                     floodFill(img_bin, seedPoints[i], Scalar(bubbleColor), &fillBox);
-                    //rectangle(img_bin, blobs[i], Scalar(100), 2);
                     //blob_elected.push_back(fillBox);
                 }
             }
@@ -161,18 +160,35 @@ namespace mct
             vector<vector<Point>> contours;
             vector<Vec4i> hierarchy;
             findContours(img_bin, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
+            //showImage(img_bin);
             // HACK: Only select contour whose child does not have child (aka bubble with text), seem to work
             for (int i = 0; i < hierarchy.size(); i++)
             {
                 Vec4i h = hierarchy[i];
-                if (h[2] > 0 && hierarchy[h[2]][2] < 0)
+                if (h[2] > 0)
                 {
+                    int t = h[2];
+                    double a = 0;
+                    Mat mask = Mat::zeros(img_bin.size(), CV_8UC1);
+                    while (t > 0)
+                    {
+                        if (hierarchy[t][2] > 0)
+                        {
+                            a = 0;
+                            break;
+                        }
+                        a += contourArea(contours[t]);
+                        t = hierarchy[t][0];
+                    }
+                    if (contourArea(contours[i]) * 0.02 > a) continue; // Remove contours with small fill percentage
+                    drawContours(mask, contours, h[2], Scalar(255), FILLED);
+                    if (mean(img_bin, mask)[0] == 255) continue; // Remove contours with non-text color content
+
                     Bubble bubble = { true, image.size(), boundingRect(contours[i]), contours[i] };
                     bubbles.push_back(bubble);
-                    //drawContours(bubble_mask, contours, i, Scalar(128), FILLED);
+
                 }
             }
-            //showImage(img_bin);
         }
 
         // Remove duplicates
@@ -181,7 +197,7 @@ namespace mct
                 return lhs.box.area() > rhs.box.area();
             });
 
-        Mat img_bin = Mat::zeros(image.size(), CV_8UC1);
+        //Mat img_bin = Mat::zeros(image.size(), CV_8UC1);
         for (int i = 0; i < bubbles.size(); ++i)
         {
             if (!bubbles[i].is_bubble) continue;
@@ -232,6 +248,19 @@ namespace mct
         for (const Bubble& b : bubbles)
         {
             if (!b.is_bubble) continue;
+            //bool overlap = false;
+            //for (const Bubble& b2 : bubbles)
+            //{
+            //    if (!b2.is_bubble || b.box == b2.box) continue;
+            //    if (compareRect(b.box, b2.box) == 1)
+            //    {
+            //        overlap = true;
+            //        break;
+            //    }
+            //}
+            //if (!overlap)
+            //{
+            //}
             drawContours(mask, vector<vector<Point>>{ b.contour }, -1, Scalar(bbl_color), FILLED, 8, noArray(), INT32_MAX, offset);
         }
         return mask;
