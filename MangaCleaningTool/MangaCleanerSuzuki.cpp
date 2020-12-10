@@ -27,7 +27,7 @@ using namespace mct;
 
 int main(int argc, char** args)
 {
-    bool doClean = false, doFrame = false, doShow = false;
+    bool doClean = false, doFrame = false, doShow = false, doResize = false;
     if (argc > 1)
     {
         if (string(args[1]).find('c') != string::npos)
@@ -42,6 +42,20 @@ int main(int argc, char** args)
         {
             doShow = true;
         }
+        if (string(args[1]).find('r') != string::npos)
+        {
+            doResize = true;
+        }
+        if (string(args[1]).find('h') != string::npos)
+        {
+            cout << "Options: " << endl;
+            cout << "c: Clean image (black/white leveling)" << endl;
+            cout << "f: Remove Frame" << endl;
+            cout << "s: Show image instead of exporting as .psd" << endl;
+            cout << "r: Resize image to height of 1600px" << endl;
+            cout << "h: Show this" << endl;
+            return 0;
+        }
     }
 
 
@@ -55,6 +69,18 @@ int main(int argc, char** args)
     //Ptr<EASTTextDetector> east = new EASTTextDetector(); // Poor accuracy
 
     //tess.SetVariable("save_best_choices", "T");
+
+    // Resize image
+    if (doResize)
+    {
+        for (auto& img : images)
+        {
+            Size sz = Size(1600. / img.second.rows * img.second.cols, 1600);
+            resize(img.second, img.second, sz, 0, 0, INTER_AREA);
+        }
+    }
+
+    // Main Loop
     for (auto& img : images)
     {
         Mat img_gray = toGrayScale(img.second);      
