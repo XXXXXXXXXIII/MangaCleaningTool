@@ -27,7 +27,7 @@ using namespace mct;
 
 int main(int argc, char** args)
 {
-    bool doClean = false, doFrame = false, doShow = false, doResize = false;
+    bool doClean = false, doFrame = false, doShow = false, doResize = false, adaptiveBubble = false;
     if (argc > 1)
     {
         if (string(args[1]).find('c') != string::npos)
@@ -46,13 +46,18 @@ int main(int argc, char** args)
         {
             doResize = true;
         }
+        if (string(args[1]).find('b') != string::npos)
+        {
+            adaptiveBubble = true;
+        }
         if (string(args[1]).find('h') != string::npos)
         {
             cout << "Options: " << endl;
+            cout << "b: Adaptive bubble mask color, default white" << endl;
             cout << "c: Clean image (black/white leveling)" << endl;
             cout << "f: Remove Frame" << endl;
-            cout << "s: Show image instead of exporting as .psd" << endl;
             cout << "r: Resize image to height of 1600px" << endl;
+            cout << "s: Show image instead of exporting as .psd" << endl;
             cout << "h: Show this" << endl;
             return 0;
         }
@@ -75,8 +80,9 @@ int main(int argc, char** args)
     {
         for (auto& img : images)
         {
+            int inter = (img.second.rows > 1600 ? INTER_AREA : INTER_LINEAR);
             Size sz = Size(1600. / img.second.rows * img.second.cols, 1600);
-            resize(img.second, img.second, sz, 0, 0, INTER_AREA);
+            resize(img.second, img.second, sz, 0, 0, inter);
         }
     }
 
@@ -137,12 +143,12 @@ int main(int argc, char** args)
         Mat img_mask(img.second.size(), CV_8UC2);
         vector<Mat> ch_mask;
         split(img_mask, ch_mask);
-        ch_mask[0] = createBubbleMask(img.second.size(), bubbles, 0, 255);
+        ch_mask[0] = createBubbleMask(img.second.size(), bubbles, (adaptiveBubble ? 0 : 255), 0);
         if (doFrame)
         {
-            bitwise_or(createBubbleMask(img.second.size(), bubbles, 0, 255), createFrameMask(img.second.size(), frames, 255, 0), ch_mask[0]);
+            bitwise_or(createBubbleMask(img.second.size(), bubbles, (adaptiveBubble ? 0 : 255), 0), createFrameMask(img.second.size(), frames, 255, 0), ch_mask[0]);
         }
-        bitwise_or(ch_mask[0], ch_mask[1], ch_mask[1]);
+        threshold(ch_mask[0], ch_mask[1], 1, 255, THRESH_BINARY);
         merge(ch_mask, img_mask);
 
         if (doShow)

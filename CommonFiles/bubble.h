@@ -25,6 +25,7 @@ namespace mct
         cv::Rect box;
         std::vector<cv::Point> contour;
         std::vector<Text> text;
+        uchar color;
 
         std::string toCSVData();
         std::vector<float> toInputData();

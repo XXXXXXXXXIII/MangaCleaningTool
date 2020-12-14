@@ -95,7 +95,7 @@ namespace mct
             Mat img_bin, img_ccl;
             const uchar bubbleColor = 180, bubbleColorH = 181;
             //bilateralFilter(image, img_bin, 5, 50, 50); // Remove noise on image
-            threshold(image, img_bin, 240, 255, THRESH_BINARY); // threshold 240 as recommended in the paper
+            threshold(image, img_bin, 220, 255, THRESH_BINARY); // threshold 240 as recommended in the paper
 
             // CCL Filter
             Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(s, s));
@@ -184,7 +184,17 @@ namespace mct
                     drawContours(mask, contours, h[2], Scalar(255), FILLED);
                     if (mean(img_bin, mask)[0] == 255) continue; // Remove contours with non-text color content
 
-                    Bubble bubble = { true, image.size(), boundingRect(contours[i]), contours[i] };
+                    // Calculate bubble color
+                    t = h[2];
+                    drawContours(mask, contours, i, Scalar(255), FILLED);
+                    while (t > 0)
+                    {
+                        drawContours(mask, contours, t, Scalar(0), FILLED);
+                        t = hierarchy[t][0];
+                    }
+                    uchar color = mean(image, mask)[0];
+
+                    struct Bubble bubble = { true, image.size(), boundingRect(contours[i]), contours[i], vector<Text>(), color };
                     bubbles.push_back(bubble);
 
                 }
@@ -225,12 +235,12 @@ namespace mct
 
     void cleanBubble(Mat& img, const vector<Bubble>& bubbles, uchar bubble_color, const Point& offset)
     {
-        Mat bubble_mask = createBubbleMask(img.size(), bubbles, 0, 255, offset);
-        //Mat bubble_mask_inv;
-        //bitwise_not(bubble_mask, bubble_mask_inv);
+        Mat bubble_mask = createBubbleMask(img.size(), bubbles, 0, 0, offset);
+        Mat bubble_mask_inv;
+        bitwise_not(bubble_mask, bubble_mask_inv);
         //bitwise_and(img, bubble_mask, img);
-        bitwise_and(img, Scalar(0), img, bubble_mask);
-        bitwise_or(img, Scalar(bubble_color), img, bubble_mask);
+        //bitwise_and(img, Scalar(0), img, bubble_mask);
+        copyTo(bubble_mask, img, bubble_mask);
     }
 
     void extractBubble(Mat& img, const vector<Bubble>& bubbles, const uchar mask_color, const Point& offset)
@@ -261,7 +271,14 @@ namespace mct
             //if (!overlap)
             //{
             //}
-            drawContours(mask, vector<vector<Point>>{ b.contour }, -1, Scalar(bbl_color), FILLED, 8, noArray(), INT32_MAX, offset);
+            if (bbl_color == back_color)
+            {
+                drawContours(mask, vector<vector<Point>>{ b.contour }, -1, Scalar(b.color), FILLED, 8, noArray(), INT32_MAX, offset);
+            }
+            else
+            {
+                drawContours(mask, vector<vector<Point>>{ b.contour }, -1, Scalar(bbl_color), FILLED, 8, noArray(), INT32_MAX, offset);
+            }
         }
         return mask;
     }
